@@ -1,648 +1,452 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎵 مشغل القرآن</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            color: #fff;
-            min-height: 100vh;
-            padding: 20px;
-            padding-bottom: 100px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-        .settings-card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .settings-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .settings-title {
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .toggle-settings {
-            background: none;
-            border: none;
-            color: #667eea;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .sources-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .source-checkbox {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 11px;
-        }
-        .source-checkbox:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        .source-checkbox.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .source-checkbox input {
-            margin-left: 8px;
-        }
-        .source-checkbox label {
-            flex: 1;
-            cursor: pointer;
-        }
-        .search-container {
-            position: relative;
-            margin-bottom: 15px;
-        }
-        .search-input {
-            width: 100%;
-            padding: 12px 15px 12px 40px;
-            border: none;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            font-size: 14px;
-        }
-        .search-input::placeholder {
-            color: #aaa;
-        }
-        .search-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #aaa;
-        }
-        .reciters-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            max-height: 180px;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-        .reciter-checkbox {
-            display: flex;
-            align-items: center;
-            padding: 8px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 11px;
-        }
-        .reciter-checkbox:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        .reciter-checkbox.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .reciter-checkbox input {
-            margin-left: 8px;
-        }
-        .reciter-checkbox label {
-            flex: 1;
-            cursor: pointer;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .selected-count {
-            font-size: 11px;
-            color: #aaa;
-            text-align: center;
-            margin-top: 10px;
-        }
-        .player-card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .reciter-info {
-            margin-bottom: 15px;
-        }
-        .reciter-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: #ffd700;
-        }
-        .riwayah-name {
-            font-size: 14px;
-            color: #aaa;
-            margin-top: 5px;
-        }
-        .current-surah {
-            font-size: 28px;
-            margin: 20px 0;
-        }
-        .surah-name-ar {
-            font-size: 22px;
-            margin-bottom: 5px;
-        }
-        .surah-name-en {
-            font-size: 16px;
-            color: #ccc;
-        }
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 25px 0;
-        }
-        .control-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: none;
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .control-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: scale(1.1);
-        }
-        .control-btn.main {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-size: 24px;
-        }
-        .progress-container {
-            margin: 20px 0;
-        }
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            transition: width 0.3s;
-        }
-        .time-display {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #aaa;
-            margin-top: 8px;
-        }
-        .playlist {
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            padding: 15px;
-        }
-        .playlist-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .playlist-title {
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .playlist-count {
-            font-size: 12px;
-            color: #aaa;
-        }
-        .playlist-item {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .playlist-item:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        .playlist-item.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .item-number {
-            width: 30px;
-            font-size: 14px;
-            color: #aaa;
-        }
-        .item-info {
-            flex: 1;
-        }
-        .item-name {
-            font-size: 14px;
-        }
-        .item-aya {
-            font-size: 12px;
-            color: #aaa;
-        }
-        .item-play {
-            width: 30px;
-            text-align: center;
-        }
-        .shuffle-btn {
-            background: none;
-            border: 1px solid rgba(255,255,255,0.3);
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .shuffle-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎵 Quran Player</title>
+  <style>
+    :root {
+      /* Auto-detect system preference */
+      @media (prefers-color-scheme: dark) {
+        --bg-primary: #121212;
+        --bg-card: #1E1E1E;
+        --bg-card-hover: #2C2C2C;
+        --text-primary: #EEEEEE;
+        --text-secondary: #B0B0B0;
+        --text-muted: #757575;
+        --border-color: #333333;
+        --accent: #9E9E9E;
+        --accent-hover: #C0C0C0;
+        --shadow: 0 2px 8px rgba(0,0,0,0.30);
+        --shadow-hover: 0 4px 16px rgba(0,0,0,0.40);
+      }
+
+      @media (prefers-color-scheme: light) {
+        --bg-primary: #FAFAFA;
+        --bg-card: #FFFFFF;
+        --bg-card-hover: #F5F5F5;
+        --text-primary: #212121;
+        --text-secondary: #616161;
+        --text-muted: #9E9E9E;
+        --border-color: #E0E0E0;
+        --accent: #616161;
+        --accent-hover: #424242;
+        --shadow: 0 2px 8px rgba(0,0,0,0.06);
+        --shadow-hover: 0 4px 16px rgba(0,0,0,0.10);
+      }
+
+      /* Default (light) */
+      --bg-primary: #FAFAFA;
+      --bg-card: #FFFFFF;
+      --bg-card-hover: #F5F5F5;
+      --text-primary: #212121;
+      --text-secondary: #616161;
+      --text-muted: #9E9E9E;
+      --border-color: #E0E0E0;
+      --accent: #616161;
+      --accent-hover: #424242;
+      --shadow: 0 2px 8px rgba(0,0,0,0.06);
+      --shadow-hover: 0 4px 16px rgba(0,0,0,0.10);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 16px;
+      padding-bottom: 120px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      transition: all 0.2s;
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    /* Sources - Simple tabs */
+    .sources {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .source-tab {
+      padding: 8px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font-size: 13px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .source-tab.active {
+      background: var(--text-primary);
+      color: var(--bg-card);
+      border-color: var(--text-primary);
+    }
+
+    /* Search */
+    .search-box {
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 16px;
+      padding-right: 44px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 15px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    /* Reciter - Single Select (Radio) */
+    .reciter {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      margin: 4px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .reciter:hover {
+      background: var(--bg-card-hover);
+    }
+
+    .reciter.selected {
+      background: var(--bg-card-hover);
+      border: 1px solid var(--accent);
+    }
+
+    .reciter-radio {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--border-color);
+      margin-left: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .reciter.selected .reciter-radio {
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+
+    .reciter.selected .reciter-radio::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--bg-card);
+    }
+
+    .reciter-info {
+      flex: 1;
+    }
+
+    .reciter-name {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .reciter-riwayah {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Player - Fixed Bottom */
+    .player {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 400px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      padding: 12px 16px;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.10);
+      z-index: 100;
+    }
+
+    .player-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .player-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bg-card);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .player-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .player-title {
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player-artist {
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .player-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+
+    .player-btn:hover {
+      background: var(--bg-card-hover);
+    }
+
+    .player-btn.play {
+      background: var(--text-primary);
+      color: var(--bg-card);
+    }
+
+    .player-btn.play:hover {
+      background: var(--accent);
+    }
+
+    .progress {
+      margin-top: 10px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: var(--border-color);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      width: 35%;
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    .progress-time {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <!-- Header -->
     <div class="header">
-        <h1>🎵 مشغل القرآن</h1>
+      <h1>🎵 مشغل القرآن</h1>
     </div>
 
-    <!-- Settings Card -->
-    <div class="settings-card" id="settingsCard">
-        <div class="settings-header">
-            <span class="settings-title">⚙️ الإعدادات</span>
-            <button class="toggle-settings" onclick="toggleSettings()">إخفاء</button>
-        </div>
-        
-        <!-- API Sources -->
-        <div class="settings-title" style="margin-bottom: 10px;">📡 مصادر الاستماع</div>
-        <div class="sources-grid">
-            <label class="source-checkbox active" onclick="toggleSource(this)">
-                <input type="checkbox" value="itqan" checked>
-                <span>🇸🇦 itqan CMS</span>
-            </label>
-            <label class="source-checkbox" onclick="toggleSource(this)">
-                <input type="checkbox" value="mp3quran">
-                <span>🌐 mp3quran</span>
-            </label>
-            <label class="source-checkbox" onclick="toggleSource(this)">
-                <input type="checkbox" value="everyayah">
-                <span>🎧 EveryAyah</span>
-            </label>
-            <label class="source-checkbox" onclick="toggleSource(this)">
-                <input type="checkbox" value="qurancom">
-                <span>📖 Quran.com</span>
-            </label>
-        </div>
-        
-        <!-- Search Reciters -->
-        <div class="settings-title" style="margin-bottom: 10px;">🔍 البحث عن القراء</div>
-        <div class="search-container">
-            <span class="search-icon">🔍</span>
-            <input type="text" class="search-input" id="reciterSearch" 
-                   placeholder="ابحث عن قارئ..." oninput="filterReciters()">
-        </div>
-        
-        <!-- Reciters List -->
-        <div class="reciters-grid" id="recitersList"></div>
-        <div class="selected-count" id="selectedCount">تم اختيار: 0 قراء</div>
+    <!-- Sources -->
+    <div class="card">
+      <div class="section-title">📡 المصادر</div>
+      <div class="sources">
+        <div class="source-tab active">itqan CMS</div>
+        <div class="source-tab">mp3quran</div>
+        <div class="source-tab">EveryAyah</div>
+        <div class="source-tab">Quran.com</div>
+      </div>
     </div>
 
-    <div class="player-card">
+    <!-- Search -->
+    <div class="card search-box">
+      <input type="text" class="search-input" placeholder="🔍 البحث عن قارئ...">
+      <span class="search-icon">🔍</span>
+    </div>
+
+    <!-- Reciters - Single Select -->
+    <div class="card">
+      <div class="section-title">📿 القارئ</div>
+      <div class="reciter selected" onclick="selectReciter(this)">
+        <div class="reciter-radio"></div>
         <div class="reciter-info">
-            <div class="reciter-name" id="reciterName">صابر عبد الحكيم</div>
-            <div class="riwayah-name" id="riwayahName">رواية عاصم</div>
+          <div class="reciter-name">بدر عبد الرحمن</div>
+          <div class="reciter-riwayah">رواية عاصم</div>
         </div>
-
-        <div class="current-surah">
-            <div class="surah-name-ar" id="surahAr">الفاتحة</div>
-            <div class="surah-name-en" id="surahEn">Al-Fatihah</div>
+      </div>
+      <div class="reciter" onclick="selectReciter(this)">
+        <div class="reciter-radio"></div>
+        <div class="reciter-info">
+          <div class="reciter-name">مجد الزامل</div>
+          <div class="reciter-riwayah">رواية حفص</div>
         </div>
-
-        <div class="controls">
-            <button class="control-btn" onclick="shuffle()">🔀</button>
-            <button class="control-btn" onclick="previous()">⏮️</button>
-            <button class="control-btn main" onclick="togglePlay()" id="playBtn">▶️</button>
-            <button class="control-btn" onclick="next()">⏭️</button>
-            <button class="control-btn" onclick="toggleLoop()">🔁</button>
+      </div>
+      <div class="reciter" onclick="selectReciter(this)">
+        <div class="reciter-radio"></div>
+        <div class="reciter-info">
+          <div class="reciter-name">عبد الرحمن السديس</div>
+          <div class="reciter-riwayah">رواية شعبة</div>
         </div>
-
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="time-display">
-                <span id="currentTime">0:00</span>
-                <span id="totalTime">0:00</span>
-            </div>
+      </div>
+      <div class="reciter" onclick="selectReciter(this)">
+        <div class="reciter-radio"></div>
+        <div class="reciter-info">
+          <div class="reciter-name">الشريم أبو بكر</div>
+          <div class="reciter-riwayah">رواية قالون</div>
         </div>
-
-        <button class="shuffle-btn" id="shuffleBtn" onclick="toggleShuffle()">🔀 ترتيب عشوائي</button>
+      </div>
     </div>
+  </div>
 
-    <div class="playlist">
-        <div class="playlist-header">
-            <span class="playlist-title">📜 قائمة التشغيل</span>
-            <span class="playlist-count" id="playlistCount">20 سورة</span>
-        </div>
-        <div id="playlistItems"></div>
+  <!-- Player -->
+  <div class="player">
+    <div class="player-content">
+      <div class="player-avatar">ب ع</div>
+      <div class="player-info">
+        <div class="player-title">سورة الفاتحة</div>
+        <div class="player-artist">بدر عبد الرحمن • رواية عاصم</div>
+      </div>
+      <div class="player-controls">
+        <button class="player-btn">🔀</button>
+        <button class="player-btn play">▶️</button>
+        <button class="player-btn">🔁</button>
+      </div>
     </div>
+    <div class="progress">
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+      <div class="progress-time">
+        <span>0:00</span>
+        <span>0:50</span>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        // Telegram Web App
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+  <script>
+    // Auto-detect system theme
+    function updateTheme() {
+      const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.style.setProperty('--bg-primary', dark ? '#121212' : '#FAFAFA');
+      document.documentElement.style.setProperty('--bg-card', dark ? '#1E1E1E' : '#FFFFFF');
+      document.documentElement.style.setProperty('--bg-card-hover', dark ? '#2C2C2C' : '#F5F5F5');
+      document.documentElement.style.setProperty('--text-primary', dark ? '#EEEEEE' : '#212121');
+      document.documentElement.style.setProperty('--text-secondary', dark ? '#B0B0B0' : '#616161');
+      document.documentElement.style.setProperty('--text-muted', dark ? '#757575' : '#9E9E9E');
+      document.documentElement.style.setProperty('--border-color', dark ? '#333333' : '#E0E0E0');
+      document.documentElement.style.setProperty('--accent', dark ? '#9E9E9E' : '#616161');
+      document.documentElement.style.setProperty('--accent-hover', dark ? '#C0C0C0' : '#424242');
+      document.documentElement.style.setProperty('--shadow', dark ? '0 2px 8px rgba(0,0,0,0.30)' : '0 2px 8px rgba(0,0,0,0.06)');
+    }
 
-        // State
-        let currentTrack = 0;
-        let isPlaying = false;
-        let isShuffle = false;
-        let isLoop = false;
-        let selectedSources = ['itqan'];
-        let selectedReciters = [];
-        let settingsExpanded = true;
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateTheme);
+    updateTheme();
 
-        // All available reciters from all sources
-        const allReciters = {
-            'itqan': [
-                { id: 1, name: 'Majid Al-Zamil', nameAr: 'مجد الزامل' },
-                { id: 2, name: 'Badr Al-Turki', nameAr: 'بدر التركي' },
-                { id: 3, name: 'Hassan Al-Daghreeri', nameAr: 'حسن الدغيري' },
-                { id: 4, name: 'Zafar Al-Qalib', nameAr: 'ظفر القليب' },
-                { id: 5, name: 'Mohammed Al-Zubaidi', nameAr: 'محمد الزبيدي' },
-                { id: 6, name: 'Nasser Al-Asfour', nameAr: 'ناصر العصفور' },
-                { id: 7, name: 'Saber Abdulhakam', nameAr: 'صابر عبد الحكيم' }
-            ],
-            'mp3quran': [
-                { id: 'baset', name: 'Abdul Baset', nameAr: 'عبد الباسط' },
-                { id: 'sudais', name: 'Sudais', nameAr: 'السديس' },
-                { id: 'shuraim', name: 'Shuraim', nameAr: 'الشريم' },
-                { id: 'minshawi', name: 'Al-Minshawi', nameAr: 'المنشاوي' },
-                { id: 'afasy', name: 'Mishary Alafasy', nameAr: 'مشاري العفاسي' }
-            ],
-            'everyayah': [
-                { id: 'baset', name: 'AbdulBaset', nameAr: 'عبد الباسط' },
-                { id: 'sudais', name: 'Abdurrahmaan As-Sudais', nameAr: 'عبد الرحمن السديس' },
-                { id: 'afasy', name: 'MisharyBinRashidAlafasy', nameAr: 'مشاري العفاسي' },
-                { id: 'shuraim', name: 'AlaaAlKhaligAlSuhaim', nameAr: 'ALA AL-KHALIQ AL-SUHAIM' }
-            ],
-            'qurancom': [
-                { id: 1, name: 'Abdullah Basfar', nameAr: 'عبد الله بصفر' },
-                { id: 2, name: 'Abdul Baset', nameAr: 'عبد الباسط' },
-                { id: 3, name: 'Hani Ar-Rifai', nameAr: 'هاني الرفاعي' }
-            ]
-        };
+    // Single reciter select
+    function selectReciter(el) {
+      document.querySelectorAll('.reciter').forEach(r => r.classList.remove('selected'));
+      el.classList.add('selected');
+    }
 
-        // Sample playlist (itqan CMS default)
-        let playlist = [
-            { id: 1, nameAr: 'الفاتحة', nameEn: 'Al-Fatihah', url: 'https://pub-9ee413c8af4041c6bd5223d08f5d0f0f.r2.dev/media/uploads/assets/34/recitations/001.mp3', source: 'itqan', reciterId: 7 },
-            { id: 2, nameAr: 'البقرة', nameEn: 'Al-Baqarah', url: 'https://pub-9ee413c8af4041c6bd5223d08f5d0f0f.r2.dev/media/uploads/assets/34/recitations/002.mp3', source: 'itqan', reciterId: 7 },
-            { id: 3, nameAr: 'آل عمران', nameEn: "Ali 'Imran", url: 'https://pub-9ee413c8af4041c6bd5223d08f5d0f0f.r2.dev/media/uploads/assets/34/recitations/003.mp3', source: 'itqan', reciterId: 7 },
-            { id: 4, nameAr: 'النساء', nameEn: 'An-Nisa', url: 'https://pub-9ee413c8af4041c6bd5223d08f5d0f0f.r2.dev/media/uploads/assets/34/recitations/004.mp3', source: 'itqan', reciterId: 7 },
-            { id: 5, nameAr: 'المائدة', nameEn: 'Al-Ma\'idah', url: 'https://pub-9ee413c8af4041c6bd5223d08f5d0f0f.r2.dev/media/uploads/assets/34/recitations/005.mp3', source: 'itqan', reciterId: 7 },
-            { id: 6, nameAr: 'الأنعام', nameEn: 'Al-An\'am', url: 'https://pub-9ee413c8af4041c6bd5223d08f5d0f0f.r2.dev/media/uploads/assets/34/recitations/006.mp3', source: 'itqan', reciterId: 7 },
-            { id: 7, nameAr: 'الأعراف', nameEn: 'Al-A\'raf', url: 'https://pub-9ee413c8af4041c6bd5223d08f5d0f0f.r2.dev/media/uploads/assets/34/recitations/007.mp3', source: 'itqan', reciterId: 7 },
-            { id: 8, nameAr: 'الأنفال', nameEn: 'Al-Anfal', url: 'https://pub-9ee413c8af4041c6bd5223d08f5d0f0f.r2.dev/media/uploads/assets/34/recitations/008.mp3', source: 'itqan', reciterId: 7 },
-            { id: 9, nameAr: 'التوبة', nameEn: 'At-Tawbah', url: 'https://pub-9ee413c8af4041c6bd5223d08f5d0f0f.r2.dev/media/uploads/assets/34/recitations/009.mp3', source: 'itqan', reciterId: 7 },
-            { id: 10, nameAr: 'يونس', nameEn: 'Yunus', url: 'https://pub-9ee413c8af4041c6bd5223d08f5d0f0f.r2.dev/media/uploads/assets/34/recitations/010.mp3', source: 'itqan', reciterId: 7 }
-        ];
-
-        let audio = new Audio();
-        let originalPlaylist = [...playlist];
-
-        function init() {
-            renderReciters();
-            updateSelectedCount();
-            renderPlaylist();
-            updateTrackInfo();
-        }
-
-        function toggleSettings() {
-            settingsExpanded = !settingsExpanded;
-            document.getElementById('settingsCard').style.display = settingsExpanded ? 'block' : 'none';
-        }
-
-        function toggleSource(element) {
-            const checkbox = element.querySelector('input');
-            checkbox.checked = !checkbox.checked;
-            
-            if (checkbox.checked) {
-                element.classList.add('active');
-                if (!selectedSources.includes(checkbox.value)) {
-                    selectedSources.push(checkbox.value);
-                }
-            } else {
-                element.classList.remove('active');
-                selectedSources = selectedSources.filter(s => s !== checkbox.value);
-            }
-            
-            renderReciters();
-        }
-
-        function toggleReciter(element) {
-            const checkbox = element.querySelector('input');
-            const reciterKey = checkbox.value;
-            
-            checkbox.checked = !checkbox.checked;
-            
-            if (checkbox.checked) {
-                element.classList.add('active');
-                selectedReciters.push(reciterKey);
-            } else {
-                element.classList.remove('active');
-                selectedReciters = selectedReciters.filter(id => id !== reciterKey);
-            }
-            
-            updateSelectedCount();
-        }
-
-        function renderReciters() {
-            const container = document.getElementById('recitersList');
-            let html = '';
-            
-            selectedSources.forEach(source => {
-                const reciters = allReciters[source] || [];
-                reciters.forEach(reciter => {
-                    const reciterKey = `${source}-${reciter.id}`;
-                    const isSelected = selectedReciters.includes(reciterKey);
-                    html += `
-                        <label class="reciter-checkbox ${isSelected ? 'active' : ''}" onclick="toggleReciter(this)">
-                            <input type="checkbox" value="${reciterKey}" ${isSelected ? 'checked' : ''}>
-                            <span>${reciter.nameAr}</span>
-                        </label>
-                    `;
-                });
-            });
-            
-            container.innerHTML = html;
-        }
-
-        function filterReciters() {
-            const searchTerm = document.getElementById('reciterSearch').value.toLowerCase();
-            const items = document.querySelectorAll('.reciter-checkbox');
-            
-            items.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                if (searchTerm === '' || text.includes(searchTerm)) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        }
-
-        function updateSelectedCount() {
-            const count = selectedReciters.length;
-            document.getElementById('selectedCount').textContent = `تم اختيار: ${count} ${count === 1 ? 'قارئ' : 'قراء'}`;
-        }
-
-        function renderPlaylist() {
-            const container = document.getElementById('playlistItems');
-            container.innerHTML = playlist.map((track, index) => `
-                <div class="playlist-item ${index === currentTrack ? 'active' : ''}" 
-                     onclick="playTrack(${index})">
-                    <span class="item-number">${track.id}</span>
-                    <div class="item-info">
-                        <div class="item-name">${track.nameAr}</div>
-                        <div class="item-aya">${track.nameEn}</div>
-                    </div>
-                    <span class="item-play">${index === currentTrack && isPlaying ? '🔊' : '▶️'}</span>
-                </div>
-            `).join('');
-            document.getElementById('playlistCount').textContent = `${playlist.length} سورة`;
-        }
-
-        function updateTrackInfo() {
-            const track = playlist[currentTrack];
-            document.getElementById('surahAr').textContent = track.nameAr;
-            document.getElementById('surahEn').textContent = track.nameEn;
-            document.getElementById('currentTime').textContent = '0:00';
-            document.getElementById('totalTime').textContent = '0:00';
-            document.getElementById('progressFill').style.width = '0%';
-            renderPlaylist();
-        }
-
-        function playTrack(index) {
-            currentTrack = index;
-            const track = playlist[currentTrack];
-            audio.src = track.url;
-            audio.play();
-            isPlaying = true;
-            document.getElementById('playBtn').textContent = '⏸️';
-            updateTrackInfo();
-        }
-
-        function togglePlay() {
-            if (isPlaying) {
-                audio.pause();
-                document.getElementById('playBtn').textContent = '▶️';
-            } else {
-                audio.play();
-                document.getElementById('playBtn').textContent = '⏸️';
-            }
-            isPlaying = !isPlaying;
-            renderPlaylist();
-        }
-
-        function previous() {
-            currentTrack = (currentTrack - 1 + playlist.length) % playlist.length;
-            playTrack(currentTrack);
-        }
-
-        function next() {
-            currentTrack = (currentTrack + 1) % playlist.length;
-            playTrack(currentTrack);
-        }
-
-        function shuffle() {
-            isShuffle = !isShuffle;
-            document.getElementById('shuffleBtn').classList.toggle('active', isShuffle);
-            if (isShuffle) {
-                const current = playlist[currentTrack];
-                const remaining = playlist.filter((_, i) => i !== currentTrack);
-                for (let i = remaining.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [remaining[i], remaining[j]] = [remaining[j], remaining[i]];
-                }
-                playlist = [current, ...remaining];
-                currentTrack = 0;
-            } else {
-                playlist = [...originalPlaylist];
-                currentTrack = 0;
-            }
-            renderPlaylist();
-        }
-
-        function toggleLoop() {
-            isLoop = !isLoop;
-            audio.loop = isLoop;
-        }
-
-        function toggleShuffle() {
-            shuffle();
-        }
-
-        // Audio events
-        audio.addEventListener('timeupdate', () => {
-            if (audio.duration) {
-                const progress = (audio.currentTime / audio.duration) * 100;
-                document.getElementById('progressFill').style.width = `${progress}%`;
-                document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
-            }
-        });
-
-        audio.addEventListener('loadedmetadata', () => {
-            document.getElementById('totalTime').textContent = formatTime(audio.duration);
-        });
-
-        audio.addEventListener('ended', () => {
-            if (!isLoop) {
-                next();
-            }
-        });
-
-        function formatTime(seconds) {
-            if (isNaN(seconds)) return '0:00';
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        // Initialize
-        init();
-    </script>
+    // Source tabs
+    document.querySelectorAll('.source-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.source-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+  </script>
 </body>
 </html>
