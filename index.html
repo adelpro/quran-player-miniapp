@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quran Mini Player</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
       --background: #ffffff;
@@ -115,6 +116,7 @@
       margin-top: 4px;
       overflow: hidden;
       display: none;
+      z-index: 10;
     }
 
     .source-dropdown.open .source-options { display: block; }
@@ -291,6 +293,28 @@
       font-variant-numeric: tabular-nums;
     }
 
+    .compact-play-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: none;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(1, 144, 221, 0.4);
+      z-index: 200;
+    }
+
+    .compact-play-btn.visible { display: flex; }
+
+    .compact-play-btn svg { width: 24px; height: 24px; }
+
     html[dir="rtl"] .reciter-radio { margin: 0 16px; }
 
     html[dir="rtl"] .search-icon { left: auto; right: 16px; }
@@ -298,6 +322,8 @@
     html[dir="rtl"] .search-input { padding-left: 16px; padding-right: 48px; }
 
     html[dir="rtl"] .player-btn svg { transform: scaleX(-1); }
+
+    html[dir="rtl"] .compact-play-btn { right: auto; left: 20px; }
   </style>
 </head>
 <body>
@@ -388,7 +414,7 @@
             <line x1="5" y1="19" x2="5" y2="5"></line>
           </svg>
         </button>
-        <button class="player-btn play" title="Play">
+        <button class="player-btn play" id="main-play-btn" title="Play">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="5 3 19 12 5 21 5 3"></polygon>
           </svg>
@@ -415,27 +441,25 @@
     </div>
   </div>
 
+  <button class="compact-play-btn" id="compact-play-btn" title="Play/Pause">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="compact-play-icon">
+      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+    </svg>
+  </button>
+
   <script>
     const translations = {
       en: {
         title: 'Quran Mini Player',
-        source: 'Source',
         searchPlaceholder: 'Search reciter...',
-        reciter: 'Reciter',
         noReciters: 'No reciters found',
-        loading: 'Loading reciters...',
-        selectReciter: 'Select a reciter',
-        qfNeedsAuth: 'Quran Foundation requires API credentials'
+        loading: 'Loading reciters...'
       },
       ar: {
         title: 'مشغل القرآن',
-        source: 'المصدر',
         searchPlaceholder: 'البحث عن قارئ...',
-        reciter: 'القارئ',
         noReciters: 'لم يتم العثور على قراء',
-        loading: 'جاري تحميل القراء...',
-        selectReciter: 'اختر قارئاً',
-        qfNeedsAuth: 'مؤسسة القرآن تحتاج بيانات اعتماد'
+        loading: 'جاري تحميل القراء...'
       }
     };
 
@@ -447,13 +471,8 @@
       mp3quran: {
         reciters: (lang) => `https://www.mp3quran.net/api/v3/reciters?language=${lang}`
       },
-      everyayah: {
-        reciters: 'https://everyayah.com/data/recitations.js'
-      },
-      quranfoundation: {
-        recitations: 'https://apis.quran.foundation/content/api/v4/recitations',
-        authNote: 'API credentials required'
-      }
+      everyayah: { reciters: 'https://everyayah.com/data/recitations.js' },
+      quranfoundation: { recitations: 'https://apis.quran.foundation/content/api/v4/recitations' }
     };
 
     const quranFoundationReciters = [
@@ -480,11 +499,55 @@
     let currentLang = 'en';
     let currentSource = 'itqan';
     let allReciters = [];
+    let isPlaying = false;
+    let currentReciter = null;
+
+    let tg = null;
+    try {
+      tg = window.Telegram.WebApp;
+      tg.ready();
+      tg.expand();
+    } catch (e) {}
 
     document.addEventListener('DOMContentLoaded', () => {
       updateTheme();
       fetchReciters();
+      handleViewportChange();
+      if (tg) tg.onEvent('viewportChanged', handleViewportChange);
+      window.addEventListener('resize', handleViewportChange);
     });
+
+    function handleViewportChange() {
+      const btn = document.getElementById('compact-play-btn');
+      if (!tg) {
+        btn.classList.toggle('visible', window.innerHeight < 600);
+        return;
+      }
+      btn.classList.toggle('visible', tg.viewportHeight < 500);
+    }
+
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      updatePlayButton();
+    }
+
+    function updatePlayButton() {
+      const mainBtn = document.getElementById('main-play-btn');
+      const compactBtn = document.getElementById('compact-play-btn');
+      const compactIcon = document.getElementById('compact-play-icon');
+      const playSvg = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+      const pauseSvg = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+
+      if (isPlaying) {
+        mainBtn.innerHTML = pauseSvg;
+        compactIcon.innerHTML = pauseSvg;
+        compactBtn.style.background = '#22c55e';
+      } else {
+        mainBtn.innerHTML = playSvg;
+        compactIcon.innerHTML = playSvg;
+        compactBtn.style.background = '';
+      }
+    }
 
     function updateTheme() {
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -519,106 +582,74 @@
       document.querySelectorAll('.source-option').forEach(opt => {
         opt.classList.toggle('selected', opt.textContent.toLowerCase().includes(source));
       });
-      
-      const sourceNames = {
-        itqan: 'itqan CMS',
-        mp3quran: 'mp3quran',
-        everyayah: 'EveryAyah',
-        quranfoundation: 'Quran Foundation'
-      };
-      document.getElementById('source-label').textContent = sourceNames[source];
+      const names = { itqan: 'itqan CMS', mp3quran: 'mp3quran', everyayah: 'EveryAyah', quranfoundation: 'Quran Foundation' };
+      document.getElementById('source-label').textContent = names[source];
       document.getElementById('source-dropdown').classList.remove('open');
-      
       fetchReciters();
     }
 
     async function fetchReciters() {
       const listEl = document.getElementById('reciter-list');
       const loadingEl = document.getElementById('loading-state');
-      
-      if (loadingEl) {
-        loadingEl.textContent = translations[currentLang].loading;
-      }
+      if (loadingEl) loadingEl.textContent = translations[currentLang].loading;
       
       try {
         let reciters = [];
-        
-        if (currentSource === 'itqan') {
-          reciters = await fetchItqanReciters();
-        } else if (currentSource === 'mp3quran') {
-          reciters = await fetchMp3QuranReciters();
-        } else if (currentSource === 'everyayah') {
-          reciters = everyayahReciters;
-        } else if (currentSource === 'quranfoundation') {
-          reciters = quranFoundationReciters;
-        }
+        if (currentSource === 'itqan') reciters = await fetchItqanReciters();
+        else if (currentSource === 'mp3quran') reciters = await fetchMp3QuranReciters();
+        else if (currentSource === 'everyayah') reciters = everyayahReciters;
+        else if (currentSource === 'quranfoundation') reciters = quranFoundationReciters;
         
         allReciters = reciters;
         renderReciters(reciters);
       } catch (error) {
-        console.error('Error fetching reciters:', error);
         listEl.innerHTML = `<div class="loading">Error loading reciters</div>`;
       }
     }
 
     async function fetchItqanReciters() {
-      const recitationsResponse = await fetch(API_ENDPOINTS.itqan.recitations);
-      if (!recitationsResponse.ok) throw new Error('Failed to fetch Itqan recitations');
-      
-      const recitationsData = await recitationsResponse.json();
+      const resp = await fetch(API_ENDPOINTS.itqan.recitations);
+      if (!resp.ok) throw new Error('Failed');
+      const data = await resp.json();
       const reciters = [];
-      
-      for (const recitation of recitationsData.results) {
+      for (const r of data.results) {
         try {
-          const detailResponse = await fetch(API_ENDPOINTS.itqan.getDetail(recitation.id));
-          if (!detailResponse.ok) continue;
-          
-          const detailData = await detailResponse.json();
-          
           reciters.push({
-            id: `itqan-${recitation.reciter.id}`,
-            name: recitation.reciter.name,
-            riwayah: recitation.riwayah.name,
-            initials: recitation.reciter.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase(),
+            id: `itqan-${r.reciter.id}`,
+            name: r.reciter.name,
+            riwayah: r.riwayah.name,
+            initials: r.reciter.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
           });
-        } catch (e) {
-          console.warn(`Skipping ${recitation.reciter.name}:`, e);
-        }
+        } catch (e) {}
       }
-      
       return reciters;
     }
 
     async function fetchMp3QuranReciters() {
-      const apiLang = currentLang === 'en' ? 'eng' : 'ar';
-      const response = await fetch(API_ENDPOINTS.mp3quran.reciters(apiLang));
-      if (!response.ok) throw new Error('Failed to fetch mp3quran reciters');
-      
-      const data = await response.json();
+      const lang = currentLang === 'en' ? 'eng' : 'ar';
+      const resp = await fetch(API_ENDPOINTS.mp3quran.reciters(lang));
+      if (!resp.ok) throw new Error('Failed');
+      const data = await resp.json();
       const reciters = [];
-      
-      for (const apiReciter of data.reciters) {
-        for (const apiMoshaf of apiReciter.moshaf) {
+      for (const r of data.reciters) {
+        for (const m of r.moshaf) {
           reciters.push({
-            id: `mp3quran-${apiReciter.id}`,
-            name: apiReciter.name,
-            riwayah: apiMoshaf.name,
-            initials: apiReciter.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase(),
+            id: `mp3quran-${r.id}`,
+            name: r.name,
+            riwayah: m.name,
+            initials: r.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
           });
         }
       }
-      
       return reciters;
     }
 
     function renderReciters(reciters) {
       const listEl = document.getElementById('reciter-list');
-      
       if (reciters.length === 0) {
         listEl.innerHTML = `<div class="loading">${translations[currentLang].noReciters}</div>`;
         return;
       }
-      
       listEl.innerHTML = reciters.map((r, i) => `
         <div class="reciter-item ${i === 0 ? 'active' : ''}" onclick="selectReciter(this, '${r.initials}', '${r.name.replace(/'/g, "\\'")}', '${r.riwayah.replace(/'/g, "\\'")}')">
           <div class="reciter-radio"></div>
@@ -631,22 +662,21 @@
     }
 
     function filterReciters() {
-      const query = document.getElementById('search-input').value.toLowerCase();
-      const filtered = allReciters.filter(r => 
-        r.name.toLowerCase().includes(query) || 
-        r.riwayah.toLowerCase().includes(query)
-      );
-      renderReciters(filtered);
+      const q = document.getElementById('search-input').value.toLowerCase();
+      renderReciters(allReciters.filter(r => r.name.toLowerCase().includes(q) || r.riwayah.toLowerCase().includes(q)));
     }
 
     function selectReciter(el, initials, name, riwaya) {
       document.querySelectorAll('.reciter-item').forEach(r => r.classList.remove('active'));
       el.classList.add('active');
-      
+      currentReciter = { initials, name, riwaya };
       document.getElementById('player-avatar').textContent = initials;
       document.getElementById('player-title').textContent = 'Al-Fatihah';
       document.getElementById('player-artist').textContent = `${name} • ${riwaya}`;
     }
+
+    document.getElementById('main-play-btn').addEventListener('click', togglePlay);
+    document.getElementById('compact-play-btn').addEventListener('click', togglePlay);
 
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.source-dropdown')) {
