@@ -5,125 +5,134 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🎵 Quran Player</title>
   <style>
+    /* Open-Tarteel Inspired Design System */
     :root {
-      /* Auto-detect system preference */
-      @media (prefers-color-scheme: dark) {
-        --bg-primary: #121212;
-        --bg-card: #1E1E1E;
-        --bg-card-hover: #2C2C2C;
-        --text-primary: #EEEEEE;
-        --text-secondary: #B0B0B0;
-        --text-muted: #757575;
-        --border-color: #333333;
-        --accent: #9E9E9E;
-        --accent-hover: #C0C0C0;
-        --shadow: 0 2px 8px rgba(0,0,0,0.30);
-        --shadow-hover: 0 4px 16px rgba(0,0,0,0.40);
-      }
-
-      @media (prefers-color-scheme: light) {
-        --bg-primary: #FAFAFA;
-        --bg-card: #FFFFFF;
-        --bg-card-hover: #F5F5F5;
-        --text-primary: #212121;
-        --text-secondary: #616161;
-        --text-muted: #9E9E9E;
-        --border-color: #E0E0E0;
-        --accent: #616161;
-        --accent-hover: #424242;
-        --shadow: 0 2px 8px rgba(0,0,0,0.06);
-        --shadow-hover: 0 4px 16px rgba(0,0,0,0.10);
-      }
-
-      /* Default (light) */
-      --bg-primary: #FAFAFA;
-      --bg-card: #FFFFFF;
-      --bg-card-hover: #F5F5F5;
-      --text-primary: #212121;
-      --text-secondary: #616161;
-      --text-muted: #9E9E9E;
-      --border-color: #E0E0E0;
-      --accent: #616161;
-      --accent-hover: #424242;
-      --shadow: 0 2px 8px rgba(0,0,0,0.06);
-      --shadow-hover: 0 4px 16px rgba(0,0,0,0.10);
+      --background: #ffffff;
+      --foreground: #171717;
+      --card: #f9fafb;
+      --card-hover: #f3f4f6;
+      --border: #e5e7eb;
+      --border-hover: #d1d5db;
+      --muted: #9ca3af;
+      --primary: #0190dd;
+      --primary-hover: #075985;
+      --success: #10b981;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+      --radius: 16px;
+      --radius-sm: 8px;
+      --transition: all 0.2s ease;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* Dark mode */
+    [data-theme="dark"] {
+      --background: #0a0a0a;
+      --foreground: #ededed;
+      --card: #1f2937;
+      --card-hover: #374151;
+      --border: #374151;
+      --border-hover: #4b5563;
+      --muted: #9ca3af;
+      --primary: #60a5fa;
+      --primary-hover: #93c5fd;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.4);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
+      background: var(--background);
+      color: var(--foreground);
       min-height: 100vh;
-      transition: background 0.3s, color 0.3s;
+      transition: var(--transition);
     }
 
     .container {
-      max-width: 400px;
+      max-width: 420px;
       margin: 0 auto;
-      padding: 16px;
-      padding-bottom: 120px;
+      padding: 20px;
+      padding-bottom: 140px;
     }
 
     /* Header */
     .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      margin-bottom: 20px;
+      padding: 16px 0;
+      margin-bottom: 24px;
     }
 
     .header h1 {
-      font-size: 18px;
+      font-size: 22px;
       font-weight: 600;
+      letter-spacing: -0.5px;
     }
 
     /* Cards */
     .card {
-      background: var(--bg-card);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border-color);
-      transition: all 0.2s;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
     }
 
-    .section-title {
-      font-size: 12px;
+    .card:hover {
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-size: 13px;
       font-weight: 600;
-      color: var(--text-muted);
+      color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
-    /* Sources - Simple tabs */
+    /* Source tabs */
     .sources {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding-bottom: 4px;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+    }
+
+    .sources::-webkit-scrollbar {
+      display: none;
     }
 
     .source-tab {
-      padding: 8px 14px;
+      padding: 10px 18px;
       border-radius: 20px;
-      border: 1px solid var(--border-color);
-      background: var(--bg-card);
-      color: var(--text-secondary);
-      font-size: 13px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 14px;
       white-space: nowrap;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: var(--transition);
+    }
+
+    .source-tab:hover {
+      border-color: var(--primary);
+      color: var(--primary);
     }
 
     .source-tab.active {
-      background: var(--text-primary);
-      color: var(--bg-card);
-      border-color: var(--text-primary);
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
     }
 
     /* Search */
@@ -133,119 +142,142 @@
 
     .search-input {
       width: 100%;
-      padding: 12px 16px;
-      padding-right: 44px;
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      font-size: 15px;
+      padding: 14px 18px;
+      padding-right: 48px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      color: var(--foreground);
+      font-size: 16px;
       outline: none;
+      transition: var(--transition);
     }
 
     .search-input:focus {
-      border-color: var(--accent);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(1, 144, 221, 0.1);
+    }
+
+    .search-input::placeholder {
+      color: var(--muted);
     }
 
     .search-icon {
       position: absolute;
-      right: 14px;
+      right: 16px;
       top: 50%;
       transform: translateY(-50%);
-      color: var(--text-muted);
+      color: var(--muted);
+      font-size: 16px;
     }
 
-    /* Reciter - Single Select (Radio) */
-    .reciter {
+    /* Reciter list - Simple, clean */
+    .reciter-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .reciter-item {
       display: flex;
       align-items: center;
-      padding: 10px;
-      margin: 4px 0;
-      border-radius: 8px;
+      padding: 14px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
       cursor: pointer;
-      transition: background 0.2s;
+      transition: var(--transition);
     }
 
-    .reciter:hover {
-      background: var(--bg-card-hover);
+    .reciter-item:hover {
+      background: var(--card-hover);
+      border-color: var(--border-hover);
     }
 
-    .reciter.selected {
-      background: var(--bg-card-hover);
-      border: 1px solid var(--accent);
+    .reciter-item.active {
+      background: var(--card-hover);
+      border-color: var(--primary);
+      border-width: 1.5px;
     }
 
     .reciter-radio {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
-      border: 2px solid var(--border-color);
-      margin-left: 12px;
+      border: 2px solid var(--border);
+      margin-left: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s;
+      transition: var(--transition);
+      flex-shrink: 0;
     }
 
-    .reciter.selected .reciter-radio {
-      border-color: var(--accent);
-      background: var(--accent);
+    .reciter-item.active .reciter-radio {
+      border-color: var(--primary);
+      background: var(--primary);
     }
 
-    .reciter.selected .reciter-radio::after {
+    .reciter-item.active .reciter-radio::after {
       content: '';
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--bg-card);
+      background: white;
     }
 
     .reciter-info {
       flex: 1;
+      min-width: 0;
     }
 
     .reciter-name {
       font-size: 15px;
       font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .reciter-riwayah {
-      font-size: 12px;
-      color: var(--text-muted);
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
     }
 
-    /* Player - Fixed Bottom */
+    /* Player - Fixed bottom */
     .player {
       position: fixed;
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
-      max-width: 400px;
-      background: var(--bg-card);
-      border-top: 1px solid var(--border-color);
-      padding: 12px 16px;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.10);
+      max-width: 420px;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: 16px 20px 20px;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
       z-index: 100;
     }
 
     .player-content {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
     .player-avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--bg-card);
+      color: white;
       font-weight: 600;
       font-size: 14px;
+      flex-shrink: 0;
     }
 
     .player-info {
@@ -255,92 +287,113 @@
 
     .player-title {
       font-weight: 600;
-      font-size: 14px;
+      font-size: 15px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .player-artist {
-      font-size: 12px;
-      color: var(--text-secondary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
     }
 
     .player-controls {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
     }
 
     .player-btn {
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       border: none;
       background: transparent;
-      color: var(--text-primary);
+      color: var(--foreground);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
-      transition: background 0.2s;
+      font-size: 18px;
+      transition: var(--transition);
     }
 
     .player-btn:hover {
-      background: var(--bg-card-hover);
+      background: var(--card-hover);
     }
 
     .player-btn.play {
-      background: var(--text-primary);
-      color: var(--bg-card);
+      background: var(--foreground);
+      color: var(--background);
+      font-size: 16px;
     }
 
     .player-btn.play:hover {
-      background: var(--accent);
+      opacity: 0.9;
     }
 
+    /* Progress */
     .progress {
-      margin-top: 10px;
+      margin-top: 14px;
     }
 
     .progress-bar {
       width: 100%;
-      height: 4px;
-      background: var(--border-color);
-      border-radius: 2px;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
       overflow: hidden;
+      cursor: pointer;
     }
 
     .progress-fill {
       width: 35%;
       height: 100%;
-      background: var(--accent);
-      border-radius: 2px;
+      background: var(--primary);
+      border-radius: 3px;
+      transition: width 0.1s linear;
     }
 
     .progress-time {
       display: flex;
       justify-content: space-between;
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Theme toggle - subtle */
+    .theme-toggle {
+      background: transparent;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      border-radius: 50%;
+      color: var(--muted);
+      transition: var(--transition);
+      font-size: 18px;
+    }
+
+    .theme-toggle:hover {
+      background: var(--card-hover);
+      color: var(--foreground);
     }
   </style>
 </head>
 <body>
   <div class="container">
     <!-- Header -->
-    <div class="header">
+    <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
       <h1>🎵 مشغل القرآن</h1>
+      <button class="theme-toggle" onclick="toggleTheme()" title="تبديل الوضع">🌙</button>
     </div>
 
     <!-- Sources -->
     <div class="card">
-      <div class="section-title">📡 المصادر</div>
+      <div class="card-title">📡 المصادر</div>
       <div class="sources">
         <div class="source-tab active">itqan CMS</div>
         <div class="source-tab">mp3quran</div>
@@ -351,39 +404,41 @@
 
     <!-- Search -->
     <div class="card search-box">
-      <input type="text" class="search-input" placeholder="🔍 البحث عن قارئ...">
+      <input type="text" class="search-input" placeholder="البحث عن قارئ...">
       <span class="search-icon">🔍</span>
     </div>
 
-    <!-- Reciters - Single Select -->
+    <!-- Reciters -->
     <div class="card">
-      <div class="section-title">📿 القارئ</div>
-      <div class="reciter selected" onclick="selectReciter(this)">
-        <div class="reciter-radio"></div>
-        <div class="reciter-info">
-          <div class="reciter-name">بدر عبد الرحمن</div>
-          <div class="reciter-riwayah">رواية عاصم</div>
+      <div class="card-title">📿 القارئ</div>
+      <div class="reciter-list">
+        <div class="reciter-item active" onclick="selectReciter(this)">
+          <div class="reciter-radio"></div>
+          <div class="reciter-info">
+            <div class="reciter-name">بدر عبد الرحمن</div>
+            <div class="reciter-riwayah">رواية عاصم</div>
+          </div>
         </div>
-      </div>
-      <div class="reciter" onclick="selectReciter(this)">
-        <div class="reciter-radio"></div>
-        <div class="reciter-info">
-          <div class="reciter-name">مجد الزامل</div>
-          <div class="reciter-riwayah">رواية حفص</div>
+        <div class="reciter-item" onclick="selectReciter(this)">
+          <div class="reciter-radio"></div>
+          <div class="reciter-info">
+            <div class="reciter-name">مجد الزامل</div>
+            <div class="reciter-riwayah">رواية حفص</div>
+          </div>
         </div>
-      </div>
-      <div class="reciter" onclick="selectReciter(this)">
-        <div class="reciter-radio"></div>
-        <div class="reciter-info">
-          <div class="reciter-name">عبد الرحمن السديس</div>
-          <div class="reciter-riwayah">رواية شعبة</div>
+        <div class="reciter-item" onclick="selectReciter(this)">
+          <div class="reciter-radio"></div>
+          <div class="reciter-info">
+            <div class="reciter-name">عبد الرحمن السديس</div>
+            <div class="reciter-riwayah">رواية شعبة</div>
+          </div>
         </div>
-      </div>
-      <div class="reciter" onclick="selectReciter(this)">
-        <div class="reciter-radio"></div>
-        <div class="reciter-info">
-          <div class="reciter-name">الشريم أبو بكر</div>
-          <div class="reciter-riwayah">رواية قالون</div>
+        <div class="reciter-item" onclick="selectReciter(this)">
+          <div class="reciter-radio"></div>
+          <div class="reciter-info">
+            <div class="reciter-name">الشريم أبو بكر</div>
+            <div class="reciter-riwayah">رواية قالون</div>
+          </div>
         </div>
       </div>
     </div>
@@ -399,7 +454,7 @@
       </div>
       <div class="player-controls">
         <button class="player-btn">🔀</button>
-        <button class="player-btn play">▶️</button>
+        <button class="player-btn play">▶</button>
         <button class="player-btn">🔁</button>
       </div>
     </div>
@@ -415,29 +470,23 @@
   </div>
 
   <script>
-    // Auto-detect system theme
+    // Theme - follows system
     function updateTheme() {
-      const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.style.setProperty('--bg-primary', dark ? '#121212' : '#FAFAFA');
-      document.documentElement.style.setProperty('--bg-card', dark ? '#1E1E1E' : '#FFFFFF');
-      document.documentElement.style.setProperty('--bg-card-hover', dark ? '#2C2C2C' : '#F5F5F5');
-      document.documentElement.style.setProperty('--text-primary', dark ? '#EEEEEE' : '#212121');
-      document.documentElement.style.setProperty('--text-secondary', dark ? '#B0B0B0' : '#616161');
-      document.documentElement.style.setProperty('--text-muted', dark ? '#757575' : '#9E9E9E');
-      document.documentElement.style.setProperty('--border-color', dark ? '#333333' : '#E0E0E0');
-      document.documentElement.style.setProperty('--accent', dark ? '#9E9E9E' : '#616161');
-      document.documentElement.style.setProperty('--accent-hover', dark ? '#C0C0C0' : '#424242');
-      document.documentElement.style.setProperty('--shadow', dark ? '0 2px 8px rgba(0,0,0,0.30)' : '0 2px 8px rgba(0,0,0,0.06)');
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
     }
-
-    // Listen for system theme changes
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateTheme);
     updateTheme();
 
-    // Single reciter select
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    }
+
+    // Single select reciter
     function selectReciter(el) {
-      document.querySelectorAll('.reciter').forEach(r => r.classList.remove('selected'));
-      el.classList.add('selected');
+      document.querySelectorAll('.reciter-item').forEach(r => r.classList.remove('active'));
+      el.classList.add('active');
     }
 
     // Source tabs
