@@ -360,7 +360,7 @@
         <div class="source-selected" onclick="toggleSource()">
           <div class="source-label">
             <svg id="current-source-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              <polygon points="5 3 19 12 5 21 5 3" fill="white"></polygon>
             </svg>
             <span id="source-label">itqan CMS</span>
           </div>
@@ -371,25 +371,25 @@
         <div class="source-options">
           <div class="source-option selected" onclick="selectSource('itqan')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              <polygon points="5 3 19 12 5 21 5 3" fill="white"></polygon>
             </svg>
             <span>itqan CMS</span>
           </div>
           <div class="source-option" onclick="selectSource('mp3quran')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              <polygon points="5 3 19 12 5 21 5 3" fill="white"></polygon>
             </svg>
             <span>mp3quran</span>
           </div>
           <div class="source-option" onclick="selectSource('everyayah')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              <polygon points="5 3 19 12 5 21 5 3" fill="white"></polygon>
             </svg>
             <span>EveryAyah</span>
           </div>
           <div class="source-option" onclick="selectSource('quranfoundation')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              <polygon points="5 3 19 12 5 21 5 3" fill="white"></polygon>
             </svg>
             <span>Quran Foundation</span>
           </div>
@@ -437,7 +437,7 @@
         </button>
         <button class="player-btn play" id="main-play-btn" title="Play">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            <polygon points="5 3 19 12 5 21 5 3" fill="white"></polygon>
           </svg>
         </button>
         <button class="player-btn" title="Next">
@@ -471,7 +471,7 @@
       </button>
       <button class="compact-btn play-btn" id="compact-play-btn" title="Play/Pause">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="compact-play-icon">
-          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          <polygon points="5 3 19 12 5 21 5 3" fill="white"></polygon>
         </svg>
       </button>
     </div>
@@ -539,7 +539,7 @@
       const mainBtn = document.getElementById('main-play-btn');
       const compactBtn = document.getElementById('compact-play-btn');
       const compactIcon = document.getElementById('compact-play-icon');
-      const playSvg = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+      const playSvg = '<polygon points="5 3 19 12 5 21 5 3" fill="white"></polygon>';
       const pauseSvg = '<rect x="6" y="4" width="4" height="16" fill="white" stroke="white"></rect><rect x="14" y="4" width="4" height="16" fill="white" stroke="white"></rect>';
       if (isPlaying) { mainBtn.innerHTML = pauseSvg; compactIcon.innerHTML = pauseSvg; compactBtn.style.background = '#22c55e'; }
       else { mainBtn.innerHTML = playSvg; compactIcon.innerHTML = playSvg; compactBtn.style.background = ''; }
