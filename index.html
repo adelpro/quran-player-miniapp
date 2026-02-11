@@ -269,18 +269,24 @@
 
     .player-btn:hover { background: var(--card-hover); }
 
-    .player-btn.play {
-      background: var(--primary);
-      color: white;
-    }
+    .player-btn.play { background: var(--primary); color: white; }
+
+    .player-btn.active { color: var(--primary); }
 
     .player-btn svg { width: 20px; height: 20px; }
 
     .progress { margin-top: 14px; }
 
-    .progress-bar { width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      cursor: pointer;
+    }
 
-    .progress-fill { width: 35%; height: 100%; background: var(--primary); border-radius: 3px; }
+    .progress-fill { width: 0%; height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.1s linear; }
 
     .progress-time {
       display: flex;
@@ -370,28 +376,16 @@
         </div>
         <div class="source-options">
           <div class="source-option selected" onclick="selectSource('itqan')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="5 3 19 12 5 21 5 3"></polygon>
             </svg>
             <span>itqan CMS</span>
           </div>
-          <div class="source-option" onclick="selectSource('mp3quran')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-            <span>mp3quran</span>
-          </div>
           <div class="source-option" onclick="selectSource('everyayah')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="5 3 19 12 5 21 5 3"></polygon>
             </svg>
             <span>EveryAyah</span>
-          </div>
-          <div class="source-option" onclick="selectSource('quranfoundation')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-            <span>Quran Foundation</span>
           </div>
         </div>
       </div>
@@ -414,13 +408,13 @@
 
   <div class="player" id="main-player">
     <div class="player-content">
-      <div class="player-avatar" id="player-avatar">BA</div>
+      <div class="player-avatar" id="player-avatar">-</div>
       <div class="player-info">
         <div class="player-title" id="player-title">Al-Fatihah</div>
         <div class="player-artist" id="player-artist">Select a reciter</div>
       </div>
       <div class="player-controls">
-        <button class="player-btn" title="Shuffle">
+        <button class="player-btn" id="shuffle-btn" title="Shuffle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="16 3 21 3 21 8"></polyline>
             <line x1="4" y1="20" x2="21" y2="3"></line>
@@ -429,7 +423,7 @@
             <line x1="4" y1="4" x2="9" y2="9"></line>
           </svg>
         </button>
-        <button class="player-btn" title="Previous">
+        <button class="player-btn" id="prev-btn" title="Previous">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="19 20 9 12 19 4 19 20"></polygon>
             <line x1="5" y1="19" x2="5" y2="5"></line>
@@ -440,13 +434,13 @@
             <polygon points="5 3 19 12 5 21 5 3" fill="white" stroke="none"></polygon>
           </svg>
         </button>
-        <button class="player-btn" title="Next">
+        <button class="player-btn" id="next-btn" title="Next">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="5 4 15 12 5 20 5 4"></polygon>
             <line x1="19" y1="5" x2="19" y2="19"></line>
           </svg>
         </button>
-        <button class="player-btn" title="Repeat">
+        <button class="player-btn" id="repeat-btn" title="Repeat">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="17 1 21 5 17 9"></polyline>
             <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
@@ -454,6 +448,15 @@
             <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
           </svg>
         </button>
+      </div>
+    </div>
+    <div class="progress">
+      <div class="progress-bar" id="progress-bar" onclick="seekTo(event)">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-time">
+        <span id="current-time">0:00</span>
+        <span id="duration">0:00</span>
       </div>
     </div>
   </div>
@@ -479,50 +482,103 @@
 
   <script>
     const translations = {
-      en: { title: 'Quran Mini Player', searchPlaceholder: 'Search reciter...', noReciters: 'No reciters found', loading: 'Loading reciters...' },
-      ar: { title: 'مشغل القرآن', searchPlaceholder: 'البحث عن قارئ...', noReciters: 'لم يتم العثور على قراء', loading: 'جاري تحميل القراء...' }
+      en: {
+        title: 'Quran Mini Player',
+        searchPlaceholder: 'Search reciter...',
+        noReciters: 'No reciters found',
+        loading: 'Loading reciters...',
+        selectReciter: 'Select a reciter',
+        alFatihah: 'Al-Fatihah'
+      },
+      ar: {
+        title: 'مشغل القرآن',
+        searchPlaceholder: 'البحث عن قارئ...',
+        noReciters: 'لم يتم العثور على قراء',
+        loading: 'جاري تحميل القراء...',
+        selectReciter: 'اختر قارئاً',
+        alFatihah: 'الفاتحة'
+      }
     };
 
     const API_ENDPOINTS = {
-      itqan: { recitations: 'https://api.cms.itqan.dev/recitations/', getDetail: (id) => `https://api.cms.itqan.dev/recitations/${id}` },
-      mp3quran: { reciters: (lang) => `https://www.mp3quran.net/api/v3/reciters?language=${lang}` },
-      everyayah: { reciters: 'https://everyayah.com/data/recitations.js' },
-      quranfoundation: { recitations: 'https://apis.quran.foundation/content/api/v4/recitations' }
+      itqan: {
+        recitations: 'https://api.cms.itqan.dev/recitations/',
+        detail: (id) => `https://api.cms.itqan.dev/recitations/${id}/`
+      },
+      everyayah: {
+        base: 'https://everyayah.com/data/'
+      }
     };
 
-    const quranFoundationReciters = [
-      { id: 'qf-1', name: 'Sheikh Mishary Rashid Alafasy', riwayah: 'Hafs', initials: 'MA' },
-      { id: 'qf-2', name: 'Sheikh Mahmoud Khalil Al-Hussary', riwayah: 'Hafs', initials: 'MH' },
-      { id: 'qf-3', name: 'Sheikh Abdul Baset Abdel Samad', riwayah: 'Hafs', initials: 'BA' },
-      { id: 'qf-4', name: 'Sheikh Mohamed Siddiq Al-Minshawi', riwayah: 'Hafs', initials: 'MS' },
-      { id: 'qf-5', name: 'Sheikh Yasser Al-Dosari', riwayah: 'Hafs', initials: 'YD' },
-    ];
-
     const everyayahReciters = [
-      { id: 'ea-1', name: 'Abdul Basit Murattal 64kbps', riwayah: 'Hafs', initials: 'AB' },
-      { id: 'ea-2', name: 'Abdullah Basfar', riwayah: 'Hafs', initials: 'AB' },
-      { id: 'ea-3', name: 'Abdurrahmaan As-Sudais', riwayah: 'Hafs', initials: 'AS' },
-      { id: 'ea-4', name: 'Abu Bakr Ash-Shaatree', riwayah: 'Hafs', initials: 'BS' },
-      { id: 'ea-5', name: 'Alafasy', riwayah: 'Hafs', initials: 'AF' },
-      { id: 'ea-6', name: 'Ghamadi', riwayah: 'Hafs', initials: 'GM' },
-      { id: 'ea-7', name: 'Hani Rifai', riwayah: 'Hafs', initials: 'HR' },
-      { id: 'ea-8', name: 'Husary', riwayah: 'Hafs', initials: 'HS' },
-      { id: 'ea-9', name: 'Maher Al Muaiqly', riwayah: 'Hafs', initials: 'MM' },
-      { id: 'ea-10', name: 'Menshawi', riwayah: 'Hafs', initials: 'MS' },
+      { id: 'abdul_basit', name: 'Abdul Basit', riwayah: 'Hafs', initials: 'AB', folder: 'Abdul_Basit_Murattal_64kbps' },
+      { id: 'abdullah_bastfar', name: 'Abdullah Basfar', riwayah: 'Hafs', initials: 'AB', folder: 'Abdullah_Basfar_64kbps' },
+      { id: 'abdurrahmaan_sudais', name: 'Abdurrahmaan As-Sudais', riwayah: 'Hafs', initials: 'AS', folder: 'Abdurrahmaan_As-Sudais_64kbps' },
+      { id: 'abu_bakr_shaatree', name: 'Abu Bakr Ash-Shaatree', riwayah: 'Hafs', initials: 'BS', folder: 'Abu_Bakr_Ash-Shaatree_64kbps' },
+      { id: 'alafasy', name: 'Mishary Alafasy', riwayah: 'Hafs', initials: 'AF', folder: 'Alafasy_64kbps' },
+      { id: 'ghamadi', name: 'Ghamadi', riwayah: 'Hafs', initials: 'GM', folder: 'Ghamadi_64kbps' },
+      { id: 'hani_rifai', name: 'Hani Rifai', riwayah: 'Hafs', initials: 'HR', folder: 'Hani_Rifai_64kbps' },
+      { id: 'husary', name: 'Mahmoud Al-Husary', riwayah: 'Hafs', initials: 'MH', folder: 'Husary_64kbps' },
+      { id: 'maher_maiqly', name: 'Maher Al Muaiqly', riwayah: 'Hafs', initials: 'MM', folder: 'MaherAlMuaiqly_64kbps' },
+      { id: 'menshawi', name: 'Mohamed Menshawi', riwayah: 'Hafs', initials: 'MS', folder: 'Menshawi_64kbps' }
     ];
 
-    let currentLang = 'en', currentSource = 'itqan', allReciters = [], isPlaying = false, currentReciter = null;
+    const SURAH_NAMES = {
+      en: ['Al-Fatihah', 'Al-Baqarah', 'Al-Imran', 'An-Nisa', 'Al-Maidah', 'Al-Anam', 'Al-Araf', 'Al-Anfal', 'At-Tawbah', 'Yunus', 'Hud', 'Yusuf', 'Ar-Rad', 'Ibrahim', 'Al-Hijr', 'An-Nahl', 'Al-Isra', 'Al-Kahf', 'Maryam', 'Ta-Ha', 'Al-Anbiya', 'Al-Hajj', 'Al-Mu-minun', 'An-Nur', 'Al-Furqan', 'Ash-Shuara', 'An-Naml', 'Al-Qasas', 'Al-Ankabut', 'Ar-Rum', 'Luqman', 'As-Sajda', 'Al-Ahzab', 'Saba', 'Fatir', 'Ya-Sin', 'As-Saffat', 'Sad', 'Az-Zumar', 'Ghafir', 'Fussilat', 'Ash-Shura', 'Az-Zukhruf', 'Ad-Dukhan', 'Al-Jathiya', 'Al-Ahqaf', 'Muhammad', 'Al-Fath', 'Al-Hujurat', 'Qaf', 'Adh-Dhariyat', 'At-Tur', 'An-Najm', 'Al-Qamar', 'Ar-Rahman', 'Al-Waqia', 'Al-Hadid', 'Al-Mujadila', 'Al-Hashr', 'Al-Mumtahina', 'As-Saff', 'Al-Jumuha', 'Al-Munafiqun', 'At-Taghabun', 'At-Talaq', 'At-Tahrim', 'Al-Mulk', 'Al-Qalam', 'Al-Haqqah', 'Al-Maarij', 'Nuh', 'Al-Jinn', 'Al-Muzzammil', 'Al-Muddathir', 'Al-Qiyama', 'Al-Mursalat', 'An-Naba', 'An-Naziat', 'Abasa', 'At-Takwir', 'Al-Infitar', 'Al-Mutaffifin', 'Al-Inshiqaq', 'Al-Buruj', 'At-Tariq', 'Al-Aala', 'Al-Ghashiyah', 'Al-Fajr', 'Al-Balad', 'Ash-Shams', 'Al-Layl', 'Ad-Duha', 'Ash-Sharh', 'At-Tin', 'Al-Alaq', 'Al-Qadr', 'Al-Bayyina', 'Az-Zalzala', 'Al-Adiyat', 'Al-Qaria', 'At-Takathur', 'Al-Asr', 'Al-Humaza', 'Al-Fil', 'Al-Quraish', 'Al-Maun', 'Al-Kawthar', 'Al-Kafirun', 'An-Nasr', 'Al-Masad', 'Al-Ikhlas', 'Al-Falaq', 'An-Nas'],
+      ar: ['الفاتحة', 'البقرة', 'آل عمران', 'النساء', 'المائدة', 'الأنعام', 'الأعراف', 'الأنفال', 'التوبة', 'يونس', 'هود', 'يوسف', 'الرعد', 'إبراهيم', 'الحجر', 'النحل', 'الإسراء', 'الكهف', 'مريم', 'طه', 'الأنبياء', 'الحج', 'المؤمنون', 'النور', 'الفرقان', 'الشعراء', 'النمل', 'القصص', 'العنكبوت', 'الروم', 'لقمان', 'السجدة', 'الأحزاب', 'سبأ', 'فاطر', 'يس', 'الصافات', 'ص', 'الزمر', 'غافر', 'فصلت', 'الشورى', 'الزخرف', 'الدخان', 'الجاثية', 'الأحقاف', 'محمد', 'الفتح', 'الحجرات', 'ق', 'الذاريات', 'الطور', 'النجم', 'القمر', 'الرحمن', 'الواقعة', 'الحديد', 'المجادلة', 'الحشر', 'الممتحنة', 'الصف', 'الجمعة', 'المنافقون', 'التغابن', 'الطلاق', 'التحريم', 'الملك', 'القلم', 'الحاقة', 'المعارج', 'نوح', 'الجن', 'المزمل', 'المدثر', 'القيامة', 'المرسلات', 'النبأ', 'النازعات', 'عبس', 'التكوير', 'الانفطار', 'المطففين', 'الانشقاق', 'البروج', 'الطارق', 'الأعلى', 'الغاشية', 'الفجر', 'البلد', 'الشمس', 'الليل', 'الضحى', 'الشرح', 'التين', 'العلق', 'القدر', 'البينة', 'الزلزلة', 'العاديات', 'القارعة', 'التكاثر', 'العصر', 'الهمزة', 'الفيل', 'قريش', 'الماعون', 'الكوثر', 'الكافرون', 'النصر', 'المسد', 'الإخلاص', 'الفلق', 'الناس']
+    };
+
+    let state = {
+      currentLang: 'en',
+      currentSource: 'itqan',
+      allReciters: [],
+      filteredReciters: [],
+      isPlaying: false,
+      isShuffle: false,
+      isRepeat: false,
+      currentReciter: null,
+      currentSurah: 1,
+      surahPlaylist: [],
+      audioPlayer: null,
+      duration: 0,
+      currentTime: 0
+    };
 
     let tg = null;
-    try { tg = window.Telegram.WebApp; tg.ready(); tg.expand(); } catch (e) {}
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function init() {
+      try {
+        tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+      } catch (e) {}
+
       updateTheme();
       fetchReciters();
+      setupEventListeners();
       handleViewportChange();
-      if (tg) tg.onEvent('viewportChanged', handleViewportChange);
+
+      if (tg) {
+        tg.onEvent('viewportChanged', handleViewportChange);
+      }
       window.addEventListener('resize', handleViewportChange);
-    });
+    }
+
+    function setupEventListeners() {
+      document.getElementById('main-play-btn').addEventListener('click', togglePlay);
+      document.getElementById('compact-play-btn').addEventListener('click', togglePlay);
+      document.getElementById('compact-stop-btn').addEventListener('click', stopPlayer);
+      document.getElementById('shuffle-btn').addEventListener('click', toggleShuffle);
+      document.getElementById('repeat-btn').addEventListener('click', toggleRepeat);
+      document.getElementById('prev-btn').addEventListener('click', playPrevious);
+      document.getElementById('next-btn').addEventListener('click', playNext);
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.source-dropdown')) {
+          document.getElementById('source-dropdown').classList.remove('open');
+        }
+      });
+    }
 
     function handleViewportChange() {
       const compactBar = document.getElementById('compact-bar');
@@ -530,29 +586,6 @@
       const isCompact = tg ? tg.viewportHeight < 500 : window.innerHeight < 600;
       compactBar.classList.toggle('visible', isCompact);
       mainPlayer.style.display = isCompact ? 'none' : 'block';
-    }
-
-    function togglePlay() { isPlaying = !isPlaying; updatePlayButton(); }
-    function stopPlayer() { isPlaying = false; updatePlayButton(); }
-
-    function updatePlayButton() {
-      const mainBtn = document.getElementById('main-play-btn');
-      const compactBtn = document.getElementById('compact-play-btn');
-      const compactIcon = document.getElementById('compact-play-icon');
-      const playSvg = '<polygon points="5 3 19 12 5 21 5 3" fill="white" stroke="none"></polygon>';
-      const pauseSvg = '<rect x="6" y="4" width="4" height="16" fill="white" stroke="white"></rect><rect x="14" y="4" width="4" height="16" fill="white" stroke="white"></rect>';
-      if (isPlaying) { mainBtn.innerHTML = pauseSvg; compactIcon.innerHTML = pauseSvg; compactBtn.style.background = '#22c55e'; }
-      else { mainBtn.innerHTML = playSvg; compactIcon.innerHTML = playSvg; compactBtn.style.background = ''; }
-    }
-
-    function updateNowPlaying() {
-      const title = currentReciter ? currentReciter.name : 'Al-Fatihah';
-      const artist = currentReciter ? currentReciter.riwayah : 'Select a reciter';
-      document.getElementById('player-title').textContent = title;
-      document.getElementById('player-artist').textContent = artist;
-      document.getElementById('compact-title').textContent = title;
-      document.getElementById('compact-artist').textContent = artist;
-      if (currentReciter) document.getElementById('player-avatar').textContent = currentReciter.initials;
     }
 
     function updateTheme() {
@@ -565,78 +598,98 @@
     });
 
     function toggleLang() {
-      currentLang = currentLang === 'en' ? 'ar' : 'en';
-      document.documentElement.lang = currentLang;
-      document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-      document.getElementById('lang-toggle').textContent = currentLang === 'en' ? 'EN' : 'عربي';
+      state.currentLang = state.currentLang === 'en' ? 'ar' : 'en';
+      document.documentElement.lang = state.currentLang;
+      document.documentElement.dir = state.currentLang === 'ar' ? 'rtl' : 'ltr';
+      document.getElementById('lang-toggle').textContent = state.currentLang === 'en' ? 'EN' : 'عربي';
       updateTranslations();
       fetchReciters();
     }
 
     function updateTranslations() {
-      const t = translations[currentLang];
+      const t = translations[state.currentLang];
       document.getElementById('page-title').textContent = t.title;
       document.getElementById('search-input').placeholder = t.searchPlaceholder;
     }
 
-    function toggleSource() { document.getElementById('source-dropdown').classList.toggle('open'); }
+    function toggleSource() {
+      document.getElementById('source-dropdown').classList.toggle('open');
+    }
 
     function selectSource(source) {
-      currentSource = source;
-      document.querySelectorAll('.source-option').forEach(opt => opt.classList.toggle('selected', opt.textContent.toLowerCase().includes(source)));
-      const names = { itqan: 'itqan CMS', mp3quran: 'mp3quran', everyayah: 'EveryAyah', quranfoundation: 'Quran Foundation' };
+      state.currentSource = source;
+      const names = { itqan: 'itqan CMS', everyayah: 'EveryAyah' };
       document.getElementById('source-label').textContent = names[source];
+
+      document.querySelectorAll('.source-option').forEach(opt => {
+        opt.classList.toggle('selected', opt.textContent.toLowerCase().includes(source));
+      });
+
       document.getElementById('source-dropdown').classList.remove('open');
       fetchReciters();
     }
 
     async function fetchReciters() {
       const listEl = document.getElementById('reciter-list');
-      const loadingEl = document.getElementById('loading-state');
-      if (loadingEl) loadingEl.textContent = translations[currentLang].loading;
+      const loadingText = translations[state.currentLang].loading;
+
+      if (document.getElementById('loading-state')) {
+        document.getElementById('loading-state').textContent = loadingText;
+      }
+
       try {
         let reciters = [];
-        if (currentSource === 'itqan') reciters = await fetchItqanReciters();
-        else if (currentSource === 'mp3quran') reciters = await fetchMp3QuranReciters();
-        else if (currentSource === 'everyayah') reciters = everyayahReciters;
-        else if (currentSource === 'quranfoundation') reciters = quranFoundationReciters;
-        allReciters = reciters;
+
+        if (state.currentSource === 'itqan') {
+          reciters = await fetchItqanReciters();
+        } else if (state.currentSource === 'everyayah') {
+          reciters = everyayahReciters;
+        }
+
+        state.allReciters = reciters;
+        state.filteredReciters = reciters;
         renderReciters(reciters);
-      } catch (error) { listEl.innerHTML = `<div class="loading">Error loading reciters</div>`; }
+      } catch (error) {
+        console.error('Error fetching reciters:', error);
+        listEl.innerHTML = `<div class="loading">Error loading reciters</div>`;
+      }
     }
 
     async function fetchItqanReciters() {
-      const resp = await fetch(API_ENDPOINTS.itqan.recitations);
-      if (!resp.ok) throw new Error('Failed');
-      const data = await resp.json();
+      const response = await fetch(API_ENDPOINTS.itqan.recitations);
+      if (!response.ok) throw new Error('Failed to fetch reciters');
+
+      const data = await response.json();
       const reciters = [];
-      for (const r of data.results) {
-        try {
-          reciters.push({ id: `itqan-${r.reciter.id}`, name: r.reciter.name, riwayah: r.riwayah.name, initials: r.reciter.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() });
-        } catch (e) {}
+
+      for (const item of data.results) {
+        reciters.push({
+          id: item.id,
+          name: item.reciter.name,
+          riwayah: item.riwayah.name,
+          initials: getInitials(item.reciter.name),
+          surahs_count: item.surahs_count,
+          hasDetail: true
+        });
       }
+
       return reciters;
     }
 
-    async function fetchMp3QuranReciters() {
-      const lang = currentLang === 'en' ? 'eng' : 'ar';
-      const resp = await fetch(API_ENDPOINTS.mp3quran.reciters(lang));
-      if (!resp.ok) throw new Error('Failed');
-      const data = await resp.json();
-      const reciters = [];
-      for (const r of data.reciters) {
-        for (const m of r.moshaf) {
-          reciters.push({ id: `mp3quran-${r.id}`, name: r.name, riwayah: m.name, initials: r.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() });
-        }
-      }
-      return reciters;
+    function getInitials(name) {
+      return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
     }
 
     function renderReciters(reciters) {
       const listEl = document.getElementById('reciter-list');
-      if (reciters.length === 0) { listEl.innerHTML = `<div class="loading">${translations[currentLang].noReciters}</div>`; return; }
+
+      if (reciters.length === 0) {
+        listEl.innerHTML = `<div class="loading">${translations[state.currentLang].noReciters}</div>`;
+        return;
+      }
+
       listEl.innerHTML = reciters.map((r, i) => `
-        <div class="reciter-item ${i === 0 ? 'active' : ''}" onclick="selectReciter(this, '${r.initials}', '${r.name.replace(/'/g, "\\'")}', '${r.riwayah.replace(/'/g, "\\'")}')">
+        <div class="reciter-item ${i === 0 ? 'active' : ''}" data-index="${i}">
           <div class="reciter-radio"></div>
           <div class="reciter-info">
             <div class="reciter-name">${r.name}</div>
@@ -644,67 +697,245 @@
           </div>
         </div>
       `).join('');
+
+      listEl.querySelectorAll('.reciter-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const index = parseInt(item.dataset.index);
+          selectReciter(index);
+        });
+      });
     }
 
     function filterReciters() {
-      const q = document.getElementById('search-input').value.toLowerCase();
-      renderReciters(allReciters.filter(r => r.name.toLowerCase().includes(q) || r.riwayah.toLowerCase().includes(q)));
+      const query = document.getElementById('search-input').value.toLowerCase();
+
+      state.filteredReciters = state.allReciters.filter(r =>
+        r.name.toLowerCase().includes(query) ||
+        r.riwayah.toLowerCase().includes(query)
+      );
+
+      renderReciters(state.filteredReciters);
     }
 
-    let audioPlayer = null;
+    async function selectReciter(index) {
+      const reciter = state.filteredReciters[index];
 
-    function selectReciter(el, initials, name, riwaya) {
+      if (!reciter) return;
+
+      state.currentReciter = reciter;
+      state.currentSurah = 1;
+
       document.querySelectorAll('.reciter-item').forEach(r => r.classList.remove('active'));
-      el.classList.add('active');
-      currentReciter = { initials, name, riwaya };
+      document.querySelectorAll('.reciter-item')[index]?.classList.add('active');
+
+      updateNowPlaying();
+
+      await loadSurahPlaylist();
+      playRecitation();
+    }
+
+    async function loadSurahPlaylist() {
+      if (!state.currentReciter) return;
+
+      state.surahPlaylist = [];
+
+      if (state.currentSource === 'itqan' && state.currentReciter.hasDetail) {
+        const response = await fetch(API_ENDPOINTS.itqan.detail(state.currentReciter.id));
+        if (response.ok) {
+          const data = await response.json();
+          state.surahPlaylist = data.results.map(item => ({
+            number: item.surah_number,
+            name: state.currentLang === 'ar' ? item.surah_name : item.surah_name_en,
+            url: item.audio_url,
+            duration: item.duration_ms
+          }));
+        }
+      } else if (state.currentSource === 'everyayah') {
+        const folder = state.currentReciter.folder;
+        for (let i = 1; i <= 114; i++) {
+          const paddedNum = String(i).padStart(3, '0');
+          state.surahPlaylist.push({
+            number: i,
+            name: SURAH_NAMES[state.currentLang][i - 1],
+            url: `${API_ENDPOINTS.everyayah.base}${folder}/${paddedNum}.mp3`,
+            duration: 0
+          });
+        }
+      }
+
+      state.surahPlaylist.sort((a, b) => a.number - b.number);
+    }
+
+    function updateNowPlaying() {
+      const surah = state.surahPlaylist.find(s => s.number === state.currentSurah);
+      const title = surah ? surah.name : translations[state.currentLang].alFatihah;
+      const artist = state.currentReciter ? `${state.currentReciter.name} - ${state.currentReciter.riwayah}` : translations[state.currentLang].selectReciter;
+
+      document.getElementById('player-title').textContent = title;
+      document.getElementById('player-artist').textContent = artist;
+      document.getElementById('compact-title').textContent = title;
+      document.getElementById('compact-artist').textContent = artist;
+      document.getElementById('player-avatar').textContent = state.currentReciter ? state.currentReciter.initials : '-';
+
+      if (surah && surah.duration) {
+        document.getElementById('duration').textContent = formatTime(surah.duration / 1000);
+      } else {
+        document.getElementById('duration').textContent = '0:00';
+      }
+    }
+
+    function formatTime(seconds) {
+      if (!seconds || isNaN(seconds)) return '0:00';
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function playRecitation() {
+      if (!state.currentReciter || state.surahPlaylist.length === 0) return;
+
+      const surah = state.surahPlaylist.find(s => s.number === state.currentSurah);
+      if (!surah || !surah.url) return;
+
+      stopPlayer();
+
+      state.audioPlayer = new Audio(surah.url);
+      state.audioPlayer.volume = 1;
+
+      state.audioPlayer.addEventListener('timeupdate', () => {
+        if (state.audioPlayer.duration) {
+          const progress = (state.audioPlayer.currentTime / state.audioPlayer.duration) * 100;
+          document.getElementById('progress-fill').style.width = `${progress}%`;
+          document.getElementById('current-time').textContent = formatTime(state.audioPlayer.currentTime);
+        }
+      });
+
+      state.audioPlayer.addEventListener('loadedmetadata', () => {
+        document.getElementById('duration').textContent = formatTime(state.audioPlayer.duration);
+      });
+
+      state.audioPlayer.addEventListener('ended', onTrackEnded);
+
+      state.audioPlayer.play().catch(e => console.log('Playback error:', e));
+      state.isPlaying = true;
+      updatePlayButton();
+    }
+
+    function stopPlayer() {
+      if (state.audioPlayer) {
+        state.audioPlayer.pause();
+        state.audioPlayer = null;
+      }
+      state.isPlaying = false;
+      state.currentTime = 0;
+      updatePlayButton();
+      updateProgress(0);
+    }
+
+    function togglePlay() {
+      if (state.isPlaying) {
+        pausePlayer();
+      } else {
+        if (!state.audioPlayer && state.currentReciter) {
+          playRecitation();
+        } else {
+          state.audioPlayer?.play();
+          state.isPlaying = true;
+          updatePlayButton();
+        }
+      }
+    }
+
+    function pausePlayer() {
+      state.audioPlayer?.pause();
+      state.isPlaying = false;
+      updatePlayButton();
+    }
+
+    function updatePlayButton() {
+      const mainBtn = document.getElementById('main-play-btn');
+      const compactBtn = document.getElementById('compact-play-btn');
+      const compactIcon = document.getElementById('compact-play-icon');
+      const playSvg = '<polygon points="5 3 19 12 5 21 5 3" fill="white" stroke="none"></polygon>';
+      const pauseSvg = '<rect x="6" y="4" width="4" height="16" fill="white" stroke="white" stroke-width="2"></rect><rect x="14" y="4" width="4" height="16" fill="white" stroke="white" stroke-width="2"></rect>';
+
+      if (state.isPlaying) {
+        mainBtn.innerHTML = pauseSvg;
+        compactIcon.innerHTML = pauseSvg;
+        compactBtn.style.background = '#22c55e';
+      } else {
+        mainBtn.innerHTML = playSvg;
+        compactIcon.innerHTML = playSvg;
+        compactBtn.style.background = '';
+      }
+    }
+
+    function updateProgress(percent) {
+      document.getElementById('progress-fill').style.width = `${percent}%`;
+    }
+
+    function seekTo(event) {
+      if (!state.audioPlayer || !state.audioPlayer.duration) return;
+
+      const bar = document.getElementById('progress-bar');
+      const rect = bar.getBoundingClientRect();
+      const percent = (event.clientX - rect.left) / rect.width;
+      state.audioPlayer.currentTime = percent * state.audioPlayer.duration;
+    }
+
+    function onTrackEnded() {
+      if (state.isRepeat) {
+        playRecitation();
+      } else {
+        playNext();
+      }
+    }
+
+    function toggleShuffle() {
+      state.isShuffle = !state.isShuffle;
+      document.getElementById('shuffle-btn').classList.toggle('active', state.isShuffle);
+    }
+
+    function toggleRepeat() {
+      state.isRepeat = !state.isRepeat;
+      document.getElementById('repeat-btn').classList.toggle('active', state.isRepeat);
+    }
+
+    function playPrevious() {
+      if (!state.surahPlaylist.length) return;
+
+      const currentIndex = state.surahPlaylist.findIndex(s => s.number === state.currentSurah);
+      if (currentIndex > 0) {
+        state.currentSurah = state.surahPlaylist[currentIndex - 1].number;
+        updateNowPlaying();
+        playRecitation();
+      }
+    }
+
+    function playNext() {
+      if (!state.surahPlaylist.length) return;
+
+      const currentIndex = state.surahPlaylist.findIndex(s => s.number === state.currentSurah);
+      if (state.isShuffle && state.surahPlaylist.length > 1) {
+        let nextIndex;
+        do {
+          nextIndex = Math.floor(Math.random() * state.surahPlaylist.length);
+        } while (nextIndex === currentIndex && state.surahPlaylist.length > 1);
+        state.currentSurah = state.surahPlaylist[nextIndex].number;
+      } else if (currentIndex < state.surahPlaylist.length - 1) {
+        state.currentSurah = state.surahPlaylist[currentIndex + 1].number;
+      } else if (state.isRepeat) {
+        state.currentSurah = state.surahPlaylist[0].number;
+      } else {
+        stopPlayer();
+        return;
+      }
+
       updateNowPlaying();
       playRecitation();
     }
 
-    async function playRecitation() {
-      if (!currentReciter) return;
-      
-      // Stop any existing playback
-      if (audioPlayer) {
-        audioPlayer.pause();
-        audioPlayer = null;
-      }
-      
-      isPlaying = true;
-      updatePlayButton();
-      
-      // Get audio URL based on source
-      let audioUrl = null;
-      
-      if (currentSource === 'itqan' && currentReciter.playlist) {
-        const firstSurah = currentReciter.playlist[0];
-        if (firstSurah) audioUrl = firstSurah.link;
-      } else if (currentSource === 'mp3quran' && currentReciter.playlist) {
-        const firstSurah = currentReciter.playlist[0];
-        if (firstSurah) audioUrl = firstSurah.link;
-      } else if (currentSource === 'everyayah') {
-        // EveryAyah URL pattern
-        audioUrl = `https://everyayah.com/data/Abdul_Basit_Murattal_64kbps/001.mp3`;
-      } else if (currentSource === 'quranfoundation') {
-        // Quran Foundation - no direct audio URL without API credentials
-        alert('Quran Foundation requires API credentials for audio playback');
-        return;
-      }
-      
-      if (audioUrl) {
-        audioPlayer = new Audio(audioUrl);
-        audioPlayer.play().catch(e => console.log('Playback error:', e));
-        audioPlayer.onended = () => { isPlaying = false; updatePlayButton(); };
-      }
-    }
-
-    document.getElementById('main-play-btn').addEventListener('click', togglePlay);
-    document.getElementById('compact-play-btn').addEventListener('click', togglePlay);
-    document.getElementById('compact-stop-btn').addEventListener('click', stopPlayer);
-
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.source-dropdown')) document.getElementById('source-dropdown').classList.remove('open');
-    });
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>

@@ -1,111 +1,50 @@
-# 🎵 Quran Player Mini App
+# Quran Mini Player
 
 Telegram Mini App for playing Quran recitations with multi-API support.
 
-![Quran Player](https://img.shields.io/badge/Telegram-MiniApp-cyan?style=for-the-badge&logo=telegram)
-
 ## Features
 
-- 🎵 Play Quran recitations from multiple sources
-- 📡 Multi-API support (itqan CMS, mp3quran, everyayah, quran.com)
-- 🔍 Search and filter reciters
-- 👥 Multi-select reciters with checkboxes
-- ⏮️⏸️▶️⏭️ Full playback controls
-- 🔀 Shuffle mode
-- 🔁 Loop mode
-- 📜 Playlist view
-- 📱 Mobile-friendly design
-- 🌙 Dark theme
-
-## Screenshots
-
-```
-┌─────────────────────────────────┐
-│ 🎵 مشغل القرآن                  │
-├─────────────────────────────────┤
-│ ⚙️ الإعدادات                    │
-│ 📡 مصادر الاستماع              │
-│ ☑️ itqan CMS  ☐ mp3quran      │
-│ ☑️ EveryAyah   ☐ Quran.com     │
-│ 🔍 البحث عن القراء              │
-│ [ابحث عن قارئ...]              │
-│ ☑️ صابر عبد الحكيم             │
-│ ☑️ مجد الزامل                  │
-├─────────────────────────────────┤
-│ 📿 صابر عبد الحكيم              │
-│ 📖 رواية عاصم                  │
-├─────────────────────────────────┤
-│        سورة الفاتحة             │
-│        Al-Fatihah              │
-├─────────────────────────────────┤
-│   🔀 ⏮️ ▶️ ⏭️ 🔁                │
-├─────────────────────────────────┤
-│ ▓▓▓░░░░░░░░░░░░░░░░░░░░░       │
-│ 0:00 / 0:50                     │
-├─────────────────────────────────┤
-│ 📜 قائمة التشغيل (20 سورة)       │
-└─────────────────────────────────┘
-```
+- Play Quran recitations from multiple sources
+- Multi-API support (itqan CMS, EveryAyah)
+- Search and filter reciters
+- Full playback controls (play/pause, stop, previous, next)
+- Shuffle and repeat modes
+- Progress bar with seek functionality
+- RTL/LTR language support
+- Dark theme support
+- Mobile-friendly design
+- Compact player mode for small screens
 
 ## API Sources
 
-| Source | Status | Reciters | Riwayahs |
-|--------|--------|----------|----------|
-| itqan CMS | ✅ Active | 7 | 10 |
-| mp3quran | ✅ Ready | 50+ | - |
-| EveryAyah | ✅ Ready | 50+ | - |
-| Quran.com | ✅ Ready | 30+ | ✅ |
+| Source | Status | Reciters | Notes |
+|--------|--------|----------|-------|
+| itqan CMS | Active | 7+ | Full surah playlist with timings |
+| EveryAyah | Active | 10 | Hardcoded reciter list |
 
 ## Quick Start
 
-### Local Development
-
 ```bash
-# Clone the repo
-git clone https://github.com/YOUR_USERNAME/quran-player-miniapp.git
 cd quran-player-miniapp
-
-# Run local server
 python3 server.py
-
-# Open in browser
-# http://localhost:8080
+# Open http://localhost:8080
 ```
 
-### Deploy to Netlify
+## Deploy
 
-1. Go to [Netlify Drop](https://app.netlify.com/drop)
-2. Drag the `quran-player-miniapp` folder
-3. Your app is live! 🎉
+### Netlify
+Drag the folder to [Netlify Drop](https://app.netlify.com/drop)
 
-### Deploy to Vercel
-
+### Vercel
 ```bash
 npx vercel --prod
-```
-
-## Telegram Bot Integration
-
-```python
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
-
-# Add to your bot
-await update.message.reply_text(
-    "🎵 افتح مشغل القرآن",
-    reply_markup=InlineKeyboardMarkup([[
-        InlineKeyboardButton(
-            "▶️ تشغيل",
-            web_app=WebAppInfo(url="https://YOUR_APP.netlify.app")
-        )
-    ]])
-)
 ```
 
 ## File Structure
 
 ```
 quran-player-miniapp/
-├── index.html      # Main Mini App (24KB)
+├── index.html      # Main Mini App (~33KB)
 ├── server.py       # Local development server
 ├── README.md       # This file
 └── .gitignore
@@ -113,17 +52,11 @@ quran-player-miniapp/
 
 ## Technologies
 
-- HTML5, CSS3, JavaScript
+- HTML5, CSS3, Vanilla JavaScript
 - Telegram Web App SDK
-- CSS Grid & Flexbox
-- Dark theme gradient design
+- CSS Custom Properties for theming
+- Fetch API for network requests
 
 ## License
 
-MIT License - Feel free to use and modify!
-
----
-
-**Made with ❤️ for the Ummah**
-
-🌙
+MIT
