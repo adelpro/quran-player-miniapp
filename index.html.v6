@@ -53,6 +53,7 @@
       padding-bottom: 140px;
     }
 
+    /* Header */
     .header {
       display: flex;
       justify-content: center;
@@ -89,6 +90,13 @@
       color: var(--primary);
     }
 
+    .lang-toggle.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    /* Source dropdown */
     .source-section {
       margin-bottom: 16px;
     }
@@ -182,6 +190,7 @@
       flex-shrink: 0;
     }
 
+    /* Search */
     .search-box {
       position: relative;
       margin-bottom: 16px;
@@ -219,6 +228,7 @@
       color: var(--muted);
     }
 
+    /* Reciter list */
     .reciter-section {
       margin-bottom: 16px;
     }
@@ -293,19 +303,14 @@
       margin-top: 2px;
     }
 
+    /* Loading state */
     .loading {
       text-align: center;
       padding: 40px 20px;
       color: var(--muted);
     }
 
-    .error {
-      text-align: center;
-      padding: 20px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
+    /* Player */
     .player {
       position: fixed;
       bottom: 0;
@@ -421,6 +426,7 @@
       font-variant-numeric: tabular-nums;
     }
 
+    /* RTL adjustments */
     html[dir="rtl"] .reciter-radio {
       margin-left: 0;
       margin-right: 14px;
@@ -439,11 +445,13 @@
 </head>
 <body>
   <div class="container">
+    <!-- Header -->
     <div class="header">
       <h1 id="page-title">Quran Mini Player</h1>
       <button class="lang-toggle" id="lang-toggle" onclick="toggleLang()">EN</button>
     </div>
 
+    <!-- Source dropdown -->
     <div class="source-section">
       <div class="source-dropdown" id="source-dropdown">
         <div class="source-selected" onclick="toggleSource()">
@@ -470,17 +478,11 @@
             </svg>
             <span>mp3quran</span>
           </div>
-          <div class="source-option" onclick="selectSource('quranfoundation')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M12 6v6l4 2"></path>
-            </svg>
-            <span>Quran Foundation</span>
-          </div>
         </div>
       </div>
     </div>
 
+    <!-- Search -->
     <div class="search-box">
       <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="8"></circle>
@@ -489,6 +491,7 @@
       <input type="text" class="search-input" id="search-input" placeholder="Search reciter..." oninput="filterReciters()">
     </div>
 
+    <!-- Reciters -->
     <div class="reciter-section">
       <div class="reciter-list" id="reciter-list">
         <div class="loading" id="loading-state">Loading reciters...</div>
@@ -496,6 +499,7 @@
     </div>
   </div>
 
+  <!-- Player -->
   <div class="player">
     <div class="player-content">
       <div class="player-avatar" id="player-avatar">BA</div>
@@ -552,6 +556,7 @@
   </div>
 
   <script>
+    // Translations
     const translations = {
       en: {
         title: 'Quran Mini Player',
@@ -561,7 +566,6 @@
         noReciters: 'No reciters found',
         loading: 'Loading reciters...',
         selectReciter: 'Select a reciter',
-        qfNeedsAuth: 'Quran Foundation requires API credentials'
       },
       ar: {
         title: 'مشغل القرآن',
@@ -571,10 +575,10 @@
         noReciters: 'لم يتم العثور على قراء',
         loading: 'جاري تحميل القراء...',
         selectReciter: 'اختر قارئاً',
-        qfNeedsAuth: 'مؤسسة القرآن تحتاج بيانات اعتماد'
       }
     };
 
+    // API endpoints (from open-tarteel-tv)
     const API_ENDPOINTS = {
       itqan: {
         recitations: 'https://api.cms.itqan.dev/recitations/',
@@ -582,36 +586,21 @@
       },
       mp3quran: {
         reciters: (lang) => `https://www.mp3quran.net/api/v3/reciters?language=${lang}`
-      },
-      quranfoundation: {
-        // Requires OAuth2 - shown as placeholder
-        recitations: 'https://apis.quran.foundation/content/api/v4/recitations',
-        authNote: 'API credentials required'
       }
     };
-
-    // Static reciters for Quran Foundation (fallback)
-    const quranFoundationReciters = [
-      { id: 'qf-1', name: 'Sheikh Mishary Rashid Alafasy', riwayah: 'Hafs', initials: 'MA' },
-      { id: 'qf-2', name: 'Sheikh Mahmoud Khalil Al-Hussary', riwayah: 'Hafs', initials: 'MH' },
-      { id: 'qf-3', name: 'Sheikh Abdul Baset Abdel Samad', riwayah: 'Hafs', initials: 'BA' },
-      { id: 'qf-4', name: 'Sheikh Mohamed Siddiq Al-Minshawi', riwayah: 'Hafs', initials: 'MS' },
-      { id: 'qf-5', name: 'Sheikh Yasser Al-Dosari', riwayah: 'Hafs', initials: 'YD' },
-      { id: 'qf-6', name: 'Sheikh Saad Al-Ghamdi', riwayah: 'Hafs', initials: 'SG' },
-      { id: 'qf-7', name: 'Sheikh Abdur Rahman Al-Sudais', riwayah: 'Hafs', initials: 'AS' },
-      { id: 'qf-8', name: 'Sheikh Ali Al-Huthaify', riwayah: 'Hafs', initials: 'AH' },
-    ];
 
     let currentLang = 'en';
     let currentSource = 'itqan';
     let allReciters = [];
 
+    // Initialize
     document.addEventListener('DOMContentLoaded', () => {
       updateTheme();
       fetchReciters();
       updateThemeIcon();
     });
 
+    // Theme functions
     function updateTheme() {
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
@@ -622,28 +611,32 @@
       document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
     }
 
-    function updateThemeIcon(isDark) {}
+    function updateThemeIcon(isDark) {
+      // Theme icon handled by language toggle
+    }
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
       document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
     });
 
+    // Language toggle
     function toggleLang() {
       currentLang = currentLang === 'en' ? 'ar' : 'en';
       document.documentElement.lang = currentLang;
       document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
       document.getElementById('lang-toggle').textContent = currentLang === 'en' ? 'EN' : 'عربي';
       updateTranslations();
-      fetchReciters();
+      fetchReciters(); // Re-fetch with new language
     }
 
     function updateTranslations() {
       const t = translations[currentLang];
       document.getElementById('page-title').textContent = t.title;
-      document.getElementById('source-label').textContent = currentSource === 'itqan' ? 'itqan CMS' : currentSource === 'mp3quran' ? 'mp3quran' : 'Quran Foundation';
+      document.getElementById('source-label').textContent = currentSource === 'itqan' ? 'itqan CMS' : 'mp3quran';
       document.getElementById('search-input').placeholder = t.searchPlaceholder;
     }
 
+    // Source dropdown
     function toggleSource() {
       document.getElementById('source-dropdown').classList.toggle('open');
     }
@@ -651,14 +644,12 @@
     function selectSource(source) {
       currentSource = source;
       document.querySelectorAll('.source-option').forEach(opt => {
-        const text = opt.textContent.toLowerCase();
-        opt.classList.toggle('selected', text.includes(source));
+        opt.classList.toggle('selected', opt.textContent.toLowerCase().includes(source));
       });
       
       const sourceNames = {
         itqan: 'itqan CMS',
-        mp3quran: 'mp3quran',
-        quranfoundation: 'Quran Foundation'
+        mp3quran: 'mp3quran'
       };
       document.getElementById('source-label').textContent = sourceNames[source];
       document.getElementById('source-dropdown').classList.remove('open');
@@ -666,6 +657,7 @@
       fetchReciters();
     }
 
+    // Fetch reciters from APIs
     async function fetchReciters() {
       const listEl = document.getElementById('reciter-list');
       const loadingEl = document.getElementById('loading-state');
@@ -681,20 +673,13 @@
           reciters = await fetchItqanReciters();
         } else if (currentSource === 'mp3quran') {
           reciters = await fetchMp3QuranReciters();
-        } else if (currentSource === 'quranfoundation') {
-          // Use static list for now - API requires credentials
-          reciters = quranFoundationReciters.map(r => ({
-            ...r,
-            name: currentLang === 'ar' ? r.name : r.name,
-            riwayah: r.riwayah
-          }));
         }
         
         allReciters = reciters;
         renderReciters(reciters);
       } catch (error) {
         console.error('Error fetching reciters:', error);
-        listEl.innerHTML = `<div class="error">${translations[currentLang].qfNeedsAuth}</div>`;
+        listEl.innerHTML = `<div class="loading">Error loading reciters</div>`;
       }
     }
 
@@ -720,8 +705,8 @@
           reciters.push({
             id: `itqan-${recitation.reciter.id}`,
             name: recitation.reciter.name,
-            riwayah: recitation.riwayah.name,
-            initials: recitation.reciter.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase(),
+            riwaya: recitation.riwayah.name,
+            server: '',
             playlist,
           });
         } catch (e) {
@@ -750,8 +735,8 @@
           reciters.push({
             id: `mp3quran-${apiReciter.id}`,
             name: apiReciter.name,
-            riwayah: apiMoshaf.name,
-            initials: apiReciter.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase(),
+            riwaya: apiMoshaf.name,
+            server: apiMoshaf.server,
             playlist,
           });
         }
@@ -760,6 +745,7 @@
       return reciters;
     }
 
+    // Render reciters
     function renderReciters(reciters) {
       const listEl = document.getElementById('reciter-list');
       
@@ -769,34 +755,38 @@
       }
       
       listEl.innerHTML = reciters.map((r, i) => `
-        <div class="reciter-item ${i === 0 ? 'active' : ''}" onclick="selectReciter(this, '${r.initials}', '${r.name.replace(/'/g, "\\'")}', '${r.riwayah.replace(/'/g, "\\'")}')">
+        <div class="reciter-item ${i === 0 ? 'active' : ''}" onclick="selectReciter(this, '${r.name}', '${r.riwaya}')">
           <div class="reciter-radio"></div>
           <div class="reciter-info">
             <div class="reciter-name">${r.name}</div>
-            <div class="reciter-riwayah">${r.riwayah}</div>
+            <div class="reciter-riwayah">${r.riwaya}</div>
           </div>
         </div>
       `).join('');
     }
 
+    // Filter reciters
     function filterReciters() {
       const query = document.getElementById('search-input').value.toLowerCase();
       const filtered = allReciters.filter(r => 
         r.name.toLowerCase().includes(query) || 
-        r.riwayah.toLowerCase().includes(query)
+        r.riwaya.toLowerCase().includes(query)
       );
       renderReciters(filtered);
     }
 
-    function selectReciter(el, initials, name, riwaya) {
+    // Select reciter
+    function selectReciter(el, name, riwaya) {
       document.querySelectorAll('.reciter-item').forEach(r => r.classList.remove('active'));
       el.classList.add('active');
       
+      const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
       document.getElementById('player-avatar').textContent = initials;
       document.getElementById('player-title').textContent = 'Al-Fatihah';
       document.getElementById('player-artist').textContent = `${name} • ${riwaya}`;
     }
 
+    // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.source-dropdown')) {
         document.getElementById('source-dropdown').classList.remove('open');
