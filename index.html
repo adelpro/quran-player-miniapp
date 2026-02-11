@@ -651,11 +651,51 @@
       renderReciters(allReciters.filter(r => r.name.toLowerCase().includes(q) || r.riwayah.toLowerCase().includes(q)));
     }
 
+    let audioPlayer = null;
+
     function selectReciter(el, initials, name, riwaya) {
       document.querySelectorAll('.reciter-item').forEach(r => r.classList.remove('active'));
       el.classList.add('active');
       currentReciter = { initials, name, riwaya };
       updateNowPlaying();
+      playRecitation();
+    }
+
+    async function playRecitation() {
+      if (!currentReciter) return;
+      
+      // Stop any existing playback
+      if (audioPlayer) {
+        audioPlayer.pause();
+        audioPlayer = null;
+      }
+      
+      isPlaying = true;
+      updatePlayButton();
+      
+      // Get audio URL based on source
+      let audioUrl = null;
+      
+      if (currentSource === 'itqan' && currentReciter.playlist) {
+        const firstSurah = currentReciter.playlist[0];
+        if (firstSurah) audioUrl = firstSurah.link;
+      } else if (currentSource === 'mp3quran' && currentReciter.playlist) {
+        const firstSurah = currentReciter.playlist[0];
+        if (firstSurah) audioUrl = firstSurah.link;
+      } else if (currentSource === 'everyayah') {
+        // EveryAyah URL pattern
+        audioUrl = `https://everyayah.com/data/Abdul_Basit_Murattal_64kbps/001.mp3`;
+      } else if (currentSource === 'quranfoundation') {
+        // Quran Foundation - no direct audio URL without API credentials
+        alert('Quran Foundation requires API credentials for audio playback');
+        return;
+      }
+      
+      if (audioUrl) {
+        audioPlayer = new Audio(audioUrl);
+        audioPlayer.play().catch(e => console.log('Playback error:', e));
+        audioPlayer.onended = () => { isPlaying = false; updatePlayButton(); };
+      }
     }
 
     document.getElementById('main-play-btn').addEventListener('click', togglePlay);
