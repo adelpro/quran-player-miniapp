@@ -16,7 +16,6 @@
       --muted: #9ca3af;
       --primary: #0190dd;
       --primary-hover: #075985;
-      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
       --radius: 16px;
       --radius-sm: 8px;
     }
@@ -31,7 +30,6 @@
       --muted: #9ca3af;
       --primary: #60a5fa;
       --primary-hover: #93c5fd;
-      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -105,7 +103,7 @@
 
     .source-label svg { width: 24px; height: 24px; }
 
-    .source-options { z-index: 100; 
+    .source-options {
       position: absolute;
       top: 100%;
       left: 0;
@@ -116,10 +114,10 @@
       margin-top: 4px;
       overflow: hidden;
       display: none;
-      z-index: 10;
+      z-index: 100;
     }
 
-    .source-dropdown.open .source-options { z-index: 100;  display: block; }
+    .source-dropdown.open .source-options { display: block; }
 
     .source-option {
       padding: 14px 16px;
@@ -293,27 +291,53 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .compact-play-btn {
+    .compact-bar {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      border: none;
-      background: var(--primary);
-      color: white;
-      cursor: pointer;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      padding: 12px 16px;
       display: none;
       align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(1, 144, 221, 0.4);
+      gap: 12px;
       z-index: 200;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
     }
 
-    .compact-play-btn.visible { display: flex; }
+    .compact-bar.visible { display: flex; }
 
-    .compact-play-btn svg { width: 24px; height: 24px; }
+    .compact-info { flex: 1; min-width: 0; }
+
+    .compact-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .compact-artist { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .compact-controls { display: flex; align-items: center; gap: 8px; }
+
+    .compact-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--foreground);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .compact-btn:hover { background: var(--card-hover); }
+
+    .compact-btn.play-btn { background: var(--primary); color: white; }
+
+    .compact-btn.stop-btn { background: #ef4444; color: white; }
+
+    .compact-btn svg { width: 18px; height: 18px; }
 
     html[dir="rtl"] .reciter-radio { margin: 0 16px; }
 
@@ -322,8 +346,6 @@
     html[dir="rtl"] .search-input { padding-left: 16px; padding-right: 48px; }
 
     html[dir="rtl"] .player-btn svg { transform: scaleX(-1); }
-
-    html[dir="rtl"] .compact-play-btn { right: auto; left: 20px; }
   </style>
 </head>
 <body>
@@ -391,7 +413,7 @@
     </div>
   </div>
 
-  <div class="player">
+  <div class="player" id="main-player">
     <div class="player-content">
       <div class="player-avatar" id="player-avatar">BA</div>
       <div class="player-info">
@@ -399,78 +421,43 @@
         <div class="player-artist" id="player-artist">Select a reciter</div>
       </div>
       <div class="player-controls">
-        <button class="player-btn" title="Shuffle">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="16 3 21 3 21 8"></polyline>
-            <line x1="4" y1="20" x2="21" y2="3"></line>
-            <polyline points="21 16 21 21 16 21"></polyline>
-            <line x1="15" y1="15" x2="21" y2="21"></line>
-            <line x1="4" y1="4" x2="9" y2="9"></line>
-          </svg>
-        </button>
-        <button class="player-btn" title="Previous">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="19 20 9 12 19 4 19 20"></polygon>
-            <line x1="5" y1="19" x2="5" y2="5"></line>
-          </svg>
-        </button>
         <button class="player-btn play" id="main-play-btn" title="Play">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="5 3 19 12 5 21 5 3"></polygon>
           </svg>
         </button>
-        <button class="player-btn" title="Next">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="5 4 15 12 5 20 5 4"></polygon>
-            <line x1="19" y1="5" x2="19" y2="19"></line>
-          </svg>
-        </button>
-        <button class="player-btn" title="Repeat">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="17 1 21 5 17 9"></polyline>
-            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-            <polyline points="7 23 3 19 7 15"></polyline>
-            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-          </svg>
-        </button>
       </div>
-    </div>
-    <div class="progress">
-      <div class="progress-bar"><div class="progress-fill"></div></div>
-      <div class="progress-time"><span>0:00</span><span>0:50</span></div>
     </div>
   </div>
 
-  <button class="compact-play-btn" id="compact-play-btn" title="Play/Pause">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="compact-play-icon">
-      <polygon points="5 3 19 12 5 21 5 3"></polygon>
-    </svg>
-  </button>
+  <div class="compact-bar" id="compact-bar">
+    <div class="compact-info">
+      <div class="compact-title" id="compact-title">Al-Fatihah</div>
+      <div class="compact-artist" id="compact-artist">Select a reciter</div>
+    </div>
+    <div class="compact-controls">
+      <button class="compact-btn stop-btn" id="compact-stop-btn" title="Stop">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="6" y="6" width="12" height="12"></rect>
+        </svg>
+      </button>
+      <button class="compact-btn play-btn" id="compact-play-btn" title="Play/Pause">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="compact-play-icon">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+      </button>
+    </div>
+  </div>
 
   <script>
     const translations = {
-      en: {
-        title: 'Quran Mini Player',
-        searchPlaceholder: 'Search reciter...',
-        noReciters: 'No reciters found',
-        loading: 'Loading reciters...'
-      },
-      ar: {
-        title: 'مشغل القرآن',
-        searchPlaceholder: 'البحث عن قارئ...',
-        noReciters: 'لم يتم العثور على قراء',
-        loading: 'جاري تحميل القراء...'
-      }
+      en: { title: 'Quran Mini Player', searchPlaceholder: 'Search reciter...', noReciters: 'No reciters found', loading: 'Loading reciters...' },
+      ar: { title: 'مشغل القرآن', searchPlaceholder: 'البحث عن قارئ...', noReciters: 'لم يتم العثور على قراء', loading: 'جاري تحميل القراء...' }
     };
 
     const API_ENDPOINTS = {
-      itqan: {
-        recitations: 'https://api.cms.itqan.dev/recitations/',
-        getDetail: (id) => `https://api.cms.itqan.dev/recitations/${id}`
-      },
-      mp3quran: {
-        reciters: (lang) => `https://www.mp3quran.net/api/v3/reciters?language=${lang}`
-      },
+      itqan: { recitations: 'https://api.cms.itqan.dev/recitations/', getDetail: (id) => `https://api.cms.itqan.dev/recitations/${id}` },
+      mp3quran: { reciters: (lang) => `https://www.mp3quran.net/api/v3/reciters?language=${lang}` },
       everyayah: { reciters: 'https://everyayah.com/data/recitations.js' },
       quranfoundation: { recitations: 'https://apis.quran.foundation/content/api/v4/recitations' }
     };
@@ -496,18 +483,10 @@
       { id: 'ea-10', name: 'Menshawi', riwayah: 'Hafs', initials: 'MS' },
     ];
 
-    let currentLang = 'en';
-    let currentSource = 'itqan';
-    let allReciters = [];
-    let isPlaying = false;
-    let currentReciter = null;
+    let currentLang = 'en', currentSource = 'itqan', allReciters = [], isPlaying = false, currentReciter = null;
 
     let tg = null;
-    try {
-      tg = window.Telegram.WebApp;
-      tg.ready();
-      tg.expand();
-    } catch (e) {}
+    try { tg = window.Telegram.WebApp; tg.ready(); tg.expand(); } catch (e) {}
 
     document.addEventListener('DOMContentLoaded', () => {
       updateTheme();
@@ -518,18 +497,15 @@
     });
 
     function handleViewportChange() {
-      const btn = document.getElementById('compact-play-btn');
-      if (!tg) {
-        btn.classList.toggle('visible', window.innerHeight < 600);
-        return;
-      }
-      btn.classList.toggle('visible', tg.viewportHeight < 500);
+      const compactBar = document.getElementById('compact-bar');
+      const mainPlayer = document.getElementById('main-player');
+      const isCompact = tg ? tg.viewportHeight < 500 : window.innerHeight < 600;
+      compactBar.classList.toggle('visible', isCompact);
+      mainPlayer.style.display = isCompact ? 'none' : 'block';
     }
 
-    function togglePlay() {
-      isPlaying = !isPlaying;
-      updatePlayButton();
-    }
+    function togglePlay() { isPlaying = !isPlaying; updatePlayButton(); }
+    function stopPlayer() { isPlaying = false; updatePlayButton(); }
 
     function updatePlayButton() {
       const mainBtn = document.getElementById('main-play-btn');
@@ -537,16 +513,18 @@
       const compactIcon = document.getElementById('compact-play-icon');
       const playSvg = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
       const pauseSvg = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+      if (isPlaying) { mainBtn.innerHTML = pauseSvg; compactIcon.innerHTML = pauseSvg; compactBtn.style.background = '#22c55e'; }
+      else { mainBtn.innerHTML = playSvg; compactIcon.innerHTML = playSvg; compactBtn.style.background = ''; }
+    }
 
-      if (isPlaying) {
-        mainBtn.innerHTML = pauseSvg;
-        compactIcon.innerHTML = pauseSvg;
-        compactBtn.style.background = '#22c55e';
-      } else {
-        mainBtn.innerHTML = playSvg;
-        compactIcon.innerHTML = playSvg;
-        compactBtn.style.background = '';
-      }
+    function updateNowPlaying() {
+      const title = currentReciter ? currentReciter.name : 'Al-Fatihah';
+      const artist = currentReciter ? currentReciter.riwayah : 'Select a reciter';
+      document.getElementById('player-title').textContent = title;
+      document.getElementById('player-artist').textContent = artist;
+      document.getElementById('compact-title').textContent = title;
+      document.getElementById('compact-artist').textContent = artist;
+      if (currentReciter) document.getElementById('player-avatar').textContent = currentReciter.initials;
     }
 
     function updateTheme() {
@@ -573,15 +551,11 @@
       document.getElementById('search-input').placeholder = t.searchPlaceholder;
     }
 
-    function toggleSource() {
-      document.getElementById('source-dropdown').classList.toggle('open');
-    }
+    function toggleSource() { document.getElementById('source-dropdown').classList.toggle('open'); }
 
     function selectSource(source) {
       currentSource = source;
-      document.querySelectorAll('.source-option').forEach(opt => {
-        opt.classList.toggle('selected', opt.textContent.toLowerCase().includes(source));
-      });
+      document.querySelectorAll('.source-option').forEach(opt => opt.classList.toggle('selected', opt.textContent.toLowerCase().includes(source)));
       const names = { itqan: 'itqan CMS', mp3quran: 'mp3quran', everyayah: 'EveryAyah', quranfoundation: 'Quran Foundation' };
       document.getElementById('source-label').textContent = names[source];
       document.getElementById('source-dropdown').classList.remove('open');
@@ -592,19 +566,15 @@
       const listEl = document.getElementById('reciter-list');
       const loadingEl = document.getElementById('loading-state');
       if (loadingEl) loadingEl.textContent = translations[currentLang].loading;
-      
       try {
         let reciters = [];
         if (currentSource === 'itqan') reciters = await fetchItqanReciters();
         else if (currentSource === 'mp3quran') reciters = await fetchMp3QuranReciters();
         else if (currentSource === 'everyayah') reciters = everyayahReciters;
         else if (currentSource === 'quranfoundation') reciters = quranFoundationReciters;
-        
         allReciters = reciters;
         renderReciters(reciters);
-      } catch (error) {
-        listEl.innerHTML = `<div class="loading">Error loading reciters</div>`;
-      }
+      } catch (error) { listEl.innerHTML = `<div class="loading">Error loading reciters</div>`; }
     }
 
     async function fetchItqanReciters() {
@@ -614,12 +584,7 @@
       const reciters = [];
       for (const r of data.results) {
         try {
-          reciters.push({
-            id: `itqan-${r.reciter.id}`,
-            name: r.reciter.name,
-            riwayah: r.riwayah.name,
-            initials: r.reciter.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
-          });
+          reciters.push({ id: `itqan-${r.reciter.id}`, name: r.reciter.name, riwayah: r.riwayah.name, initials: r.reciter.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() });
         } catch (e) {}
       }
       return reciters;
@@ -633,12 +598,7 @@
       const reciters = [];
       for (const r of data.reciters) {
         for (const m of r.moshaf) {
-          reciters.push({
-            id: `mp3quran-${r.id}`,
-            name: r.name,
-            riwayah: m.name,
-            initials: r.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
-          });
+          reciters.push({ id: `mp3quran-${r.id}`, name: r.name, riwayah: m.name, initials: r.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() });
         }
       }
       return reciters;
@@ -646,10 +606,7 @@
 
     function renderReciters(reciters) {
       const listEl = document.getElementById('reciter-list');
-      if (reciters.length === 0) {
-        listEl.innerHTML = `<div class="loading">${translations[currentLang].noReciters}</div>`;
-        return;
-      }
+      if (reciters.length === 0) { listEl.innerHTML = `<div class="loading">${translations[currentLang].noReciters}</div>`; return; }
       listEl.innerHTML = reciters.map((r, i) => `
         <div class="reciter-item ${i === 0 ? 'active' : ''}" onclick="selectReciter(this, '${r.initials}', '${r.name.replace(/'/g, "\\'")}', '${r.riwayah.replace(/'/g, "\\'")}')">
           <div class="reciter-radio"></div>
@@ -670,18 +627,15 @@
       document.querySelectorAll('.reciter-item').forEach(r => r.classList.remove('active'));
       el.classList.add('active');
       currentReciter = { initials, name, riwaya };
-      document.getElementById('player-avatar').textContent = initials;
-      document.getElementById('player-title').textContent = 'Al-Fatihah';
-      document.getElementById('player-artist').textContent = `${name} • ${riwaya}`;
+      updateNowPlaying();
     }
 
     document.getElementById('main-play-btn').addEventListener('click', togglePlay);
     document.getElementById('compact-play-btn').addEventListener('click', togglePlay);
+    document.getElementById('compact-stop-btn').addEventListener('click', stopPlayer);
 
     document.addEventListener('click', (e) => {
-      if (!e.target.closest('.source-dropdown')) {
-        document.getElementById('source-dropdown').classList.remove('open');
-      }
+      if (!e.target.closest('.source-dropdown')) document.getElementById('source-dropdown').classList.remove('open');
     });
   </script>
 </body>
