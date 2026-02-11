@@ -89,9 +89,13 @@
       color: var(--primary);
     }
 
-    .source-section { margin-bottom: 16px; }
+    .source-section {
+      margin-bottom: 16px;
+    }
 
-    .source-dropdown { position: relative; }
+    .source-dropdown {
+      position: relative;
+    }
 
     .source-selected {
       display: flex;
@@ -105,7 +109,9 @@
       transition: var(--transition);
     }
 
-    .source-selected:hover { border-color: var(--border-hover); }
+    .source-selected:hover {
+      border-color: var(--border-hover);
+    }
 
     .source-selected svg {
       width: 20px;
@@ -114,7 +120,9 @@
       flex-shrink: 0;
     }
 
-    .source-dropdown.open .source-selected svg { transform: rotate(180deg); }
+    .source-dropdown.open .source-selected svg {
+      transform: rotate(180deg);
+    }
 
     .source-label {
       display: flex;
@@ -122,7 +130,10 @@
       gap: 10px;
     }
 
-    .source-label svg { width: 24px; height: 24px; }
+    .source-label svg {
+      width: 24px;
+      height: 24px;
+    }
 
     .source-options {
       position: absolute;
@@ -156,16 +167,25 @@
       gap: 12px;
     }
 
-    .source-option:hover { background: var(--card-hover); }
+    .source-option:hover {
+      background: var(--card-hover);
+    }
 
     .source-option.selected {
       background: var(--primary);
       color: white;
     }
 
-    .source-option svg { width: 24px; height: 24px; flex-shrink: 0; }
+    .source-option svg {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
 
-    .search-box { position: relative; margin-bottom: 16px; }
+    .search-box {
+      position: relative;
+      margin-bottom: 16px;
+    }
 
     .search-input {
       width: 100%;
@@ -185,7 +205,9 @@
       box-shadow: 0 0 0 3px rgba(1, 144, 221, 0.1);
     }
 
-    .search-input::placeholder { color: var(--muted); }
+    .search-input::placeholder {
+      color: var(--muted);
+    }
 
     .search-icon {
       position: absolute;
@@ -197,9 +219,15 @@
       color: var(--muted);
     }
 
-    .reciter-section { margin-bottom: 16px; }
+    .reciter-section {
+      margin-bottom: 16px;
+    }
 
-    .reciter-list { display: flex; flex-direction: column; gap: 8px; }
+    .reciter-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
 
     .reciter-item {
       display: flex;
@@ -249,9 +277,15 @@
       background: white;
     }
 
-    .reciter-info { flex: 1; min-width: 0; }
+    .reciter-info {
+      flex: 1;
+      min-width: 0;
+    }
 
-    .reciter-name { font-size: 15px; font-weight: 500; }
+    .reciter-name {
+      font-size: 15px;
+      font-weight: 500;
+    }
 
     .reciter-riwayah {
       font-size: 13px;
@@ -263,6 +297,13 @@
       text-align: center;
       padding: 40px 20px;
       color: var(--muted);
+    }
+
+    .error {
+      text-align: center;
+      padding: 20px;
+      color: var(--muted);
+      font-size: 14px;
     }
 
     .player {
@@ -279,7 +320,11 @@
       z-index: 100;
     }
 
-    .player-content { display: flex; align-items: center; gap: 14px; }
+    .player-content {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
 
     .player-avatar {
       width: 48px;
@@ -295,7 +340,10 @@
       flex-shrink: 0;
     }
 
-    .player-info { flex: 1; min-width: 0; }
+    .player-info {
+      flex: 1;
+      min-width: 0;
+    }
 
     .player-title {
       font-weight: 600;
@@ -305,9 +353,17 @@
       text-overflow: ellipsis;
     }
 
-    .player-artist { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .player-artist {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
 
-    .player-controls { display: flex; align-items: center; gap: 6px; }
+    .player-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
     .player-btn {
       width: 40px;
@@ -323,16 +379,23 @@
       transition: var(--transition);
     }
 
-    .player-btn:hover { background: var(--card-hover); }
+    .player-btn:hover {
+      background: var(--card-hover);
+    }
 
     .player-btn.play {
       background: var(--foreground);
       color: var(--background);
     }
 
-    .player-btn svg { width: 20px; height: 20px; }
+    .player-btn svg {
+      width: 20px;
+      height: 20px;
+    }
 
-    .progress { margin-top: 14px; }
+    .progress {
+      margin-top: 14px;
+    }
 
     .progress-bar {
       width: 100%;
@@ -358,11 +421,20 @@
       font-variant-numeric: tabular-nums;
     }
 
-    html[dir="rtl"] .reciter-radio { margin-left: 0; margin-right: 14px; }
+    html[dir="rtl"] .reciter-radio {
+      margin-left: 0;
+      margin-right: 14px;
+    }
 
-    html[dir="rtl"] .search-icon { left: auto; right: 16px; }
+    html[dir="rtl"] .search-icon {
+      left: auto;
+      right: 16px;
+    }
 
-    html[dir="rtl"] .search-input { padding-left: 16px; padding-right: 48px; }
+    html[dir="rtl"] .search-input {
+      padding-left: 16px;
+      padding-right: 48px;
+    }
   </style>
 </head>
 <body>
@@ -398,16 +470,10 @@
             </svg>
             <span>mp3quran</span>
           </div>
-          <div class="source-option" onclick="selectSource('everyayah')">
+          <div class="source-option" onclick="selectSource('quranfoundation')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
               <path d="M12 6v6l4 2"></path>
-            </svg>
-            <span>EveryAyah</span>
-          </div>
-          <div class="source-option" onclick="selectSource('quranfoundation')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
             </svg>
             <span>Quran Foundation</span>
           </div>
@@ -475,8 +541,13 @@
       </div>
     </div>
     <div class="progress">
-      <div class="progress-bar"><div class="progress-fill"></div></div>
-      <div class="progress-time"><span>0:00</span><span>0:50</span></div>
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+      <div class="progress-time">
+        <span>0:00</span>
+        <span>0:50</span>
+      </div>
     </div>
   </div>
 
@@ -512,36 +583,23 @@
       mp3quran: {
         reciters: (lang) => `https://www.mp3quran.net/api/v3/reciters?language=${lang}`
       },
-      everyayah: {
-        reciters: 'https://everyayah.com/data/recitations.js'
-      },
       quranfoundation: {
+        // Requires OAuth2 - shown as placeholder
         recitations: 'https://apis.quran.foundation/content/api/v4/recitations',
         authNote: 'API credentials required'
       }
     };
 
-    // Quran Foundation static reciters
+    // Static reciters for Quran Foundation (fallback)
     const quranFoundationReciters = [
       { id: 'qf-1', name: 'Sheikh Mishary Rashid Alafasy', riwayah: 'Hafs', initials: 'MA' },
       { id: 'qf-2', name: 'Sheikh Mahmoud Khalil Al-Hussary', riwayah: 'Hafs', initials: 'MH' },
       { id: 'qf-3', name: 'Sheikh Abdul Baset Abdel Samad', riwayah: 'Hafs', initials: 'BA' },
       { id: 'qf-4', name: 'Sheikh Mohamed Siddiq Al-Minshawi', riwayah: 'Hafs', initials: 'MS' },
       { id: 'qf-5', name: 'Sheikh Yasser Al-Dosari', riwayah: 'Hafs', initials: 'YD' },
-    ];
-
-    // EveryAyah reciters (parsed from recitations.js)
-    const everyayahReciters = [
-      { id: 'ea-1', name: 'Abdul Basit Murattal 64kbps', riwayah: 'Hafs', initials: 'AB' },
-      { id: 'ea-2', name: 'Abdullah Basfar', riwayah: 'Hafs', initials: 'AB' },
-      { id: 'ea-3', name: 'Abdurrahmaan As-Sudais', riwayah: 'Hafs', initials: 'AS' },
-      { id: 'ea-4', name: 'Abu Bakr Ash-Shaatree', riwayah: 'Hafs', initials: 'BS' },
-      { id: 'ea-5', name: 'Alafasy', riwayah: 'Hafs', initials: 'AF' },
-      { id: 'ea-6', name: 'Ghamadi', riwayah: 'Hafs', initials: 'GM' },
-      { id: 'ea-7', name: 'Hani Rifai', riwayah: 'Hafs', initials: 'HR' },
-      { id: 'ea-8', name: 'Husary', riwayah: 'Hafs', initials: 'HS' },
-      { id: 'ea-9', name: 'Maher Al Muaiqly', riwayah: 'Hafs', initials: 'MM' },
-      { id: 'ea-10', name: 'Menshawi', riwayah: 'Hafs', initials: 'MS' },
+      { id: 'qf-6', name: 'Sheikh Saad Al-Ghamdi', riwayah: 'Hafs', initials: 'SG' },
+      { id: 'qf-7', name: 'Sheikh Abdur Rahman Al-Sudais', riwayah: 'Hafs', initials: 'AS' },
+      { id: 'qf-8', name: 'Sheikh Ali Al-Huthaify', riwayah: 'Hafs', initials: 'AH' },
     ];
 
     let currentLang = 'en';
@@ -551,6 +609,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       updateTheme();
       fetchReciters();
+      updateThemeIcon();
     });
 
     function updateTheme() {
@@ -562,6 +621,8 @@
       const current = document.documentElement.getAttribute('data-theme');
       document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
     }
+
+    function updateThemeIcon(isDark) {}
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
       document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
@@ -579,6 +640,7 @@
     function updateTranslations() {
       const t = translations[currentLang];
       document.getElementById('page-title').textContent = t.title;
+      document.getElementById('source-label').textContent = currentSource === 'itqan' ? 'itqan CMS' : currentSource === 'mp3quran' ? 'mp3quran' : 'Quran Foundation';
       document.getElementById('search-input').placeholder = t.searchPlaceholder;
     }
 
@@ -589,13 +651,13 @@
     function selectSource(source) {
       currentSource = source;
       document.querySelectorAll('.source-option').forEach(opt => {
-        opt.classList.toggle('selected', opt.textContent.toLowerCase().includes(source));
+        const text = opt.textContent.toLowerCase();
+        opt.classList.toggle('selected', text.includes(source));
       });
       
       const sourceNames = {
         itqan: 'itqan CMS',
         mp3quran: 'mp3quran',
-        everyayah: 'EveryAyah',
         quranfoundation: 'Quran Foundation'
       };
       document.getElementById('source-label').textContent = sourceNames[source];
@@ -619,17 +681,20 @@
           reciters = await fetchItqanReciters();
         } else if (currentSource === 'mp3quran') {
           reciters = await fetchMp3QuranReciters();
-        } else if (currentSource === 'everyayah') {
-          reciters = everyayahReciters;
         } else if (currentSource === 'quranfoundation') {
-          reciters = quranFoundationReciters;
+          // Use static list for now - API requires credentials
+          reciters = quranFoundationReciters.map(r => ({
+            ...r,
+            name: currentLang === 'ar' ? r.name : r.name,
+            riwayah: r.riwayah
+          }));
         }
         
         allReciters = reciters;
         renderReciters(reciters);
       } catch (error) {
         console.error('Error fetching reciters:', error);
-        listEl.innerHTML = `<div class="loading">Error loading reciters</div>`;
+        listEl.innerHTML = `<div class="error">${translations[currentLang].qfNeedsAuth}</div>`;
       }
     }
 
@@ -647,11 +712,17 @@
           
           const detailData = await detailResponse.json();
           
+          const playlist = detailData.results.map(surah => ({
+            surahId: String(surah.surah_number),
+            link: surah.audio_url,
+          }));
+          
           reciters.push({
             id: `itqan-${recitation.reciter.id}`,
             name: recitation.reciter.name,
             riwayah: recitation.riwayah.name,
             initials: recitation.reciter.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase(),
+            playlist,
           });
         } catch (e) {
           console.warn(`Skipping ${recitation.reciter.name}:`, e);
@@ -671,11 +742,17 @@
       
       for (const apiReciter of data.reciters) {
         for (const apiMoshaf of apiReciter.moshaf) {
+          const playlist = apiMoshaf.surah_list.split(',').map(surahId => ({
+            surahId,
+            link: `${apiMoshaf.server}${surahId.padStart(3, '0')}.mp3`,
+          }));
+          
           reciters.push({
             id: `mp3quran-${apiReciter.id}`,
             name: apiReciter.name,
             riwayah: apiMoshaf.name,
             initials: apiReciter.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase(),
+            playlist,
           });
         }
       }
